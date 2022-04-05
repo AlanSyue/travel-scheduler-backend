@@ -114,4 +114,11 @@ return [
         ],
     ],
 
+    'clients' => [
+        'sendgrid' => [
+            'api_url' => 'https://api.sendgrid.com/v3',
+            'api_key' => env('MAIL_PASSWORD'),
+        ],
+    ],
+
 ];
