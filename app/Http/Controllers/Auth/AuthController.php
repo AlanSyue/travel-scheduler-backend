@@ -6,7 +6,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Auth\Requests\AuthRequest;
+use Auth\Services\EmailLoginService;
 use Auth\Services\EmailRegisterService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -34,6 +37,22 @@ class AuthController extends Controller
             throw $th;
         }
     }
+
+    /**
+     * Sign in the account.
+     *
+     * @param Request           $request
+     * @param EmailLoginService $service
+     *
+     * @return Response
+     */
+    public function login(Request $request, EmailLoginService $service): Response
+    {
+        try {
+            return $service->execute($request->email, $request->password);
+        } catch (Throwable $th) {
+            Log::error($th->getMessage());
+
             throw $th;
         }
     }

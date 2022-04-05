@@ -24,4 +24,6 @@ Route::prefix('v1')->group(function () {
         ->controller(AuthController::class)
         ->group(function () {
             Route::post('/{driver}/register', 'register');
+            Route::post('/{driver}/login', 'login');
+        });
 });
