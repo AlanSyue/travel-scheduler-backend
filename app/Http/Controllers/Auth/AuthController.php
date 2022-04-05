@@ -6,6 +6,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Auth\Requests\AuthRequest;
+use Auth\Services\EmailRegisterService;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -23,4 +26,15 @@ class AuthController extends Controller
 
         $auth_dto = $request->toDto();
 
+        try {
+            $service->execute($auth_dto);
+        } catch (Throwable $th) {
+            Log::error($th->getMessage());
+
+            throw $th;
+        }
+    }
+            throw $th;
+        }
+    }
 }
