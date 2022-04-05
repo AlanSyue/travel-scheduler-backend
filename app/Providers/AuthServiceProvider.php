@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Repositories\ClientRepositoryInterface;
+use App\Repositories\EloquentClientRepository;
+use App\Repositories\EloquentUserRepository;
+use App\Repositories\UserRepositoryInterface;
+use Auth\Services\EmailRegisterService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
@@ -16,6 +20,21 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         'App\Models\Model' => 'App\Policies\ModelPolicy',
     ];
+
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->when(EmailRegisterService::class)
+            ->needs(UserRepositoryInterface::class)
+            ->give(EloquentUserRepository::class);
+
+        $this->app->bind(ClientRepositoryInterface::class, EloquentClientRepository::class);
+
+    }
 
     /**
      * Register any authentication / authorization services.
