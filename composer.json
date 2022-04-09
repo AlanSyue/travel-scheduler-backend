@@ -28,7 +28,8 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Auth\\": "modules/Auth/"
+            "Auth\\": "modules/Auth/",
+            "Trip\\": "modules/Trip/"
         }
     },
     "autoload-dev": {
