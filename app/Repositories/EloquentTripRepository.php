@@ -43,4 +43,21 @@ class EloquentTripRepository implements TripRepositoryInterface
                 return (new Trip($trip->id, $user_id, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
             });
     }
+
+    /**
+     * Insert and get ID.
+     *
+     * @param Trip $trip
+     *
+     * @return int
+     */
+    public function insertGetId(Trip $trip): int
+    {
+        return $this->trip_model->insertGetId([
+            'title' => $trip->getTitle(),
+            'user_id' => $trip->getUserId(),
+            'start_at' => $trip->getStartAt(),
+            'end_at' => $trip->getEndAt()
+        ]);
+    }
 }

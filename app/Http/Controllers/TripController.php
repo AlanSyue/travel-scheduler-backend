@@ -6,6 +6,7 @@ use App\Repositories\TripRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Trip\Entities\Trip;
 use Trip\Transformer\TripsTransformer;
 
 class TripController extends Controller
@@ -28,4 +29,35 @@ class TripController extends Controller
         return response()->json($transformer->transform($trips));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Response
+     */
+    public function create(Request $request, TripRepositoryInterface $repo)
+    {
+        $user_id = $request->user()->id;
+
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        $trip = new Trip(
+            null,
+            $user_id,
+            $request->title,
+            $request->start_date,
+            $request->end_date
+        );
+
+        $trip_id = $repo->insertGetId($trip);
+
+        return response()->json([
+            'data' => [
+                'id' => $trip_id,
+            ],
+        ]);
+    }
 }

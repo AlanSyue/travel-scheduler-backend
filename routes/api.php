@@ -32,5 +32,6 @@ Route::prefix('v1')->group(function () {
         ->controller(TripController::class)
         ->group(function () {
             Route::get('/', 'index');
+            Route::post('/', 'create');
         });
 });
