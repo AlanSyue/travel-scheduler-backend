@@ -33,7 +33,6 @@ class AuthServiceProvider extends ServiceProvider
             ->give(EloquentUserRepository::class);
 
         $this->app->bind(ClientRepositoryInterface::class, EloquentClientRepository::class);
-
     }
 
     /**
