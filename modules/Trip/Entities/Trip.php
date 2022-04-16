@@ -44,18 +44,18 @@ class Trip
     private $end_at;
 
     /**
-     * The trip total days.
-     *
-     * @var int
-     */
-    private $days;
-
-    /**
      * The editors.
      *
      * @var array
      */
     private $editors = [];
+
+    /**
+     * The schedules of the trip.
+     *
+     * @var array|Schedule[]
+     */
+    private $schedules = [];
 
     /**
      * Create a new entity instance.
@@ -201,6 +201,23 @@ class Trip
     }
 
     /**
+     * Transform to trip detail array.
+     *
+     * @return array
+     */
+    public function toDetailArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'start_date' => $this->getStartAt()->format('Y-m-d'),
+            'end_date' => $this->getEndAt()->format('Y-m-d'),
+            'editors' => $this->editors,
+            'schedules' => $this->schedules,
+        ];
+    }
+
+    /**
      * Get the trip start at.
      *
      * @return Carbon
@@ -244,6 +261,30 @@ class Trip
     public function setEndAt(string $end_at): self
     {
         $this->end_at = $end_at;
+
+        return $this;
+    }
+
+    /**
+     * Get the schedules of the trip.
+     *
+     * @return array|Schedule[]
+     */
+    public function getSchedules(): array
+    {
+        return $this->schedules;
+    }
+
+    /**
+     * Set the schedules of the trip.
+     *
+     * @param array|Schedule[] $schedules the schedules of the trip
+     *
+     * @return self
+     */
+    public function setSchedules($schedules): self
+    {
+        $this->schedules = $schedules;
 
         return $this;
     }

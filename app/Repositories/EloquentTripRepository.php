@@ -45,6 +45,20 @@ class EloquentTripRepository implements TripRepositoryInterface
     }
 
     /**
+     * Find the trip.
+     *
+     * @param int $trip_id
+     *
+     * @return null|Trip
+     */
+    public function find(int $trip_id): ?Trip
+    {
+        $trip = $this->trip_model->where('id', $trip_id)->first();
+
+        return $trip ? new Trip($trip->id, $trip->user_id, $trip->title, $trip->start_at, $trip->end_at) : null;
+    }
+
+    /**
      * Insert and get ID.
      *
      * @param Trip $trip
@@ -57,7 +71,7 @@ class EloquentTripRepository implements TripRepositoryInterface
             'title' => $trip->getTitle(),
             'user_id' => $trip->getUserId(),
             'start_at' => $trip->getStartAt(),
-            'end_at' => $trip->getEndAt()
+            'end_at' => $trip->getEndAt(),
         ]);
     }
 }

@@ -33,5 +33,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'create');
+            Route::get('/{id}', 'detail');
+            Route::post('/{id}', 'createSchedules');
         });
 });

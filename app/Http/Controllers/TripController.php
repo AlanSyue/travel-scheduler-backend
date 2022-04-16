@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Repositories\TripRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Trip\Entities\Trip;
+use Trip\Services\CreateSchedulesService;
+use Trip\Services\GetDetailService;
+use Trip\Transformer\TripDetailTransformer;
 use Trip\Transformer\TripsTransformer;
 
 class TripController extends Controller
@@ -32,9 +34,9 @@ class TripController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function create(Request $request, TripRepositoryInterface $repo)
+    public function create(Request $request, TripRepositoryInterface $repo): JsonResponse
     {
         $user_id = $request->user()->id;
 
@@ -59,5 +61,60 @@ class TripController extends Controller
                 'id' => $trip_id,
             ],
         ]);
+    }
+
+    /**
+     * Get the trip detail.
+     *
+     * @param int                   $trip_id
+     * @param Request               $request
+     * @param GetDetailService      $service
+     * @param TripDetailTransformer $transformer
+     *
+     * @return JsonResponse
+     */
+    public function detail(
+        int $trip_id,
+        Request $request,
+        GetDetailService $service,
+        TripDetailTransformer $transformer
+    ): JsonResponse {
+        $day = $request->query('day');
+        $user_id = $request->user()->id;
+
+        try {
+            $trip_detail = $service->execute($trip_id, $user_id, $day);
+
+            return response()->json($transformer->transform($trip_detail));
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     * Create the schedules of the trip.
+     *
+     * @param int                    $trip_id
+     * @param Request                $request
+     * @param CreateSchedulesService $service
+     *
+     * @return JsonResponse
+     */
+    public function createSchedules(int $trip_id, Request $request, CreateSchedulesService $service): JsonResponse
+    {
+        $user_id = $request->user()->id;
+
+        $validated = $request->validate([
+            'day' => 'required|int',
+            'schedules' => 'required|array',
+        ]);
+
+        try {
+            $service->execute($trip_id, $user_id, $request->day, $request->schedules);
+
+            return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

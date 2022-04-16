@@ -12,4 +12,6 @@ interface TripRepositoryInterface
     public function findByUserId(int $user_id): Collection;
 
     public function insertGetId(Trip $trip): int;
+
+    public function find(int $trip_id): ?Trip;
 }
