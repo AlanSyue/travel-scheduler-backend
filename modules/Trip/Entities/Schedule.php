@@ -342,6 +342,27 @@ class Schedule
             'start_time' => $this->start_time,
             'duration' => $this->duration,
             'traffic_time' => $this->traffic_time,
+            'lat' => $this->lat,
+            'long' => $this->long,
+        ];
+    }
+
+    /**
+     * Transform to the detail array.
+     *
+     * @return array
+     */
+    public function toDetailArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'trip_id' => $this->trip_id,
+            'type' => $this->type,
+            'day' => $this->day,
+            'address' => $this->address,
+            'start_time' => $this->start_time,
+            'duration' => $this->duration,
+            'traffic_time' => $this->traffic_time,
             'position' => [
                 'lat' => $this->lat,
                 'long' => $this->long,

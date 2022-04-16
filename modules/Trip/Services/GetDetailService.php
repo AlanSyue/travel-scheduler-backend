@@ -66,7 +66,7 @@ class GetDetailService
         $schedules = ($this->schedule_repo->findByTripId($trip->getId(), $day))
             ->map(function (Collection $schedules) {
                 return $schedules->map(function (Schedule $schedule) {
-                    return $schedule->toArray();
+                    return $schedule->toDetailArray();
                 })->toArray();
             })
             ->values()
