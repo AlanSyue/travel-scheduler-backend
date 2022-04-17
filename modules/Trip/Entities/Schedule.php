@@ -355,6 +355,7 @@ class Schedule
     public function toDetailArray(): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'trip_id' => $this->trip_id,
             'type' => $this->type,
