@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Trip\Entities\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +51,7 @@ class TripController extends Controller
 
         $trip = new Trip(
             null,
-            $user_id,
+            User::find($user_id),
             $request->title,
             $request->start_date,
             $request->end_date

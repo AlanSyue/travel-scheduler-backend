@@ -40,11 +40,18 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->with(['user'])
             ->where('user_id', $user_id)
             ->get()
-            ->transform(function (ModelsTrip $trip) use ($user_id) {
+            ->transform(function (ModelsTrip $trip) {
                 return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
             });
     }
 
+    /**
+     * Find by is published column.
+     *
+     * @param bool $is_published
+     *
+     * @return Collection
+     */
     public function findByIsPublished(bool $is_published): Collection
     {
         return $this->trip_model

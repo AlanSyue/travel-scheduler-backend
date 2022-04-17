@@ -33,7 +33,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/home', 'index');
     });
 
-
     Route::prefix('/trips')
         ->middleware('auth:api')
         ->controller(TripController::class)
