@@ -354,6 +354,7 @@ class Schedule
             'traffic_time' => $this->traffic_time,
             'lat' => $this->lat,
             'long' => $this->long,
+            'description' => $this->description,
         ];
     }
 

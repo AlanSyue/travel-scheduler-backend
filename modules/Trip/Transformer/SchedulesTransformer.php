@@ -22,7 +22,8 @@ class SchedulesTransformer
                 $schedule['duration'],
                 $schedule['traffic_time'],
                 $schedule['position']['lat'],
-                $schedule['position']['long']
+                $schedule['position']['long'],
+                $schedule['description'] ?? ''
             ))->toArray();
         })->toArray();
     }
