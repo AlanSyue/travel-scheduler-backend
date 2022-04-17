@@ -39,6 +39,7 @@ class EloquentTripRepository implements TripRepositoryInterface
         return $this->trip_model
             ->with(['user'])
             ->where('user_id', $user_id)
+            ->where('is_published', false)
             ->get()
             ->transform(function (ModelsTrip $trip) {
                 return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
@@ -57,6 +58,7 @@ class EloquentTripRepository implements TripRepositoryInterface
         return $this->trip_model
             ->with(['user'])
             ->where('is_published', $is_published)
+            ->orderBy('updated_at')
             ->get()
             ->transform(function (ModelsTrip $trip) {
                 return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
