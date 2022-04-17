@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\TripRepositoryInterface;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Trip\Entities\Trip;
-use Trip\Services\CreateSchedulesService;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Trip\Services\GetDetailService;
-use Trip\Transformer\TripDetailTransformer;
 use Trip\Transformer\TripsTransformer;
+use Illuminate\Support\Facades\Storage;
+use Trip\Services\CreateSchedulesService;
+use Trip\Transformer\TripDetailTransformer;
+use App\Repositories\TripRepositoryInterface;
+use Trip\Services\UpdateSchedulesService;
 
 class TripController extends Controller
 {
@@ -59,6 +61,10 @@ class TripController extends Controller
         return response()->json([
             'data' => [
                 'id' => $trip_id,
+                "title" => $trip->getTitle(),
+                "start_date" => $trip->getStartAt()->format('Y-m-d'),
+                "end_date" => $trip->getEndAt()->format('Y-m-d'),
+                'days' => $trip->getDays(),
             ],
         ]);
     }
@@ -116,5 +122,23 @@ class TripController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    public function update(int $trip_id, Request $request, UpdateSchedulesService $service)
+    {
+        $user_id = $request->user()->id;
+
+        $validated = $request->validate([
+            'schedules' => 'required|array',
+        ]);
+
+        try {
+            $service->execute($trip_id, $user_id, $request->schedules);
+
+            return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
     }
 }

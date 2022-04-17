@@ -35,5 +35,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/', 'create');
             Route::get('/{id}', 'detail');
             Route::post('/{id}', 'createSchedules');
+            Route::patch('/{id}', 'update');
         });
 });

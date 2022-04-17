@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\Schedule as ModelsSchedule;
+use App\Models\ScheduleImage as ModelsScheduleImage;
 use Illuminate\Support\Collection;
 use Trip\Entities\Schedule;
 
@@ -17,14 +18,18 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
      */
     private $schedule_model;
 
+    private $schedule_image_model;
+
     /**
      * Create a new repository instance.
      *
      * @param ModelsSchedule $schedule_model
+     * @param $schedule_image_model
      */
-    public function __construct(ModelsSchedule $schedule_model)
+    public function __construct(ModelsSchedule $schedule_model, ModelsScheduleImage $schedule_image_model)
     {
         $this->schedule_model = $schedule_model;
+        $this->schedule_image_model = $schedule_image_model;
     }
 
     /**
@@ -93,5 +98,17 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
                     );
                 });
             });
+    }
+
+    public function update(int $schedule_id, array $update_data)
+    {
+        $this->schedule_model->where('id', $schedule_id)
+            ->update($update_data);
+    }
+
+    public function insertImages(int $schedule_id, array $images)
+    {
+        $this->schedule_image_model->where('schedule_id', $schedule_id)->delete();
+        $this->schedule_image_model->insert($images);
     }
 }

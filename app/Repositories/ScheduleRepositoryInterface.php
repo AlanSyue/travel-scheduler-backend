@@ -13,4 +13,8 @@ interface ScheduleRepositoryInterface
     public function insert(array $schedules);
 
     public function findByTripId(int $trip_id, ?int $day): Collection;
+
+    public function update(int $schedule_id, array $update_data);
+
+    public function insertImages(int $schedule_id, array $images);
 }
