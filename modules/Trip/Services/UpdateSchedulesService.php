@@ -32,7 +32,7 @@ class UpdateSchedulesService
 
         collect($schedules)->each(function ($schedule) {
             $schedule_id = $schedule['id'];
-            $description = $schedule['description'];
+            $description = $schedule['description'] ?? '';
 
             $this->schedule_repo->update($schedule_id, ['description' => $description]);
 
