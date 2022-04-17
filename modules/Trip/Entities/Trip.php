@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Trip\Entities;
 
 use Carbon\Carbon;
+use App\Models\User;
 
 class Trip
 {
@@ -16,11 +17,11 @@ class Trip
     private $id;
 
     /**
-     * The user ID.
+     * The user model instance.
      *
-     * @var int
+     * @var User
      */
-    private $user_id;
+    private $user;
 
     /**
      * The trip title.
@@ -61,15 +62,15 @@ class Trip
      * Create a new entity instance.
      *
      * @param null|int $id
-     * @param int      $user_id
+     * @param User      $user
      * @param string   $title
      * @param string   $start_at
      * @param string   $end_at
      */
-    public function __construct(?int $id, int $user_id, string $title, string $start_at, string $end_at)
+    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at)
     {
         $this->id = $id;
-        $this->user_id = $user_id;
+        $this->user = $user;
         $this->title = $title;
         $this->start_at = $start_at;
         $this->end_at = $end_at;
@@ -106,21 +107,7 @@ class Trip
      */
     public function getUserId(): int
     {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the user ID.
-     *
-     * @param int $user_id
-     *
-     * @return self
-     */
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
+        return $this->user->id;
     }
 
     /**
@@ -196,6 +183,11 @@ class Trip
             'id' => $this->id,
             'title' => $this->title,
             'days' => $this->getDays(),
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'image_url' => $this->user->image_url ?? '',
+            ],
             'editors' => $this->editors,
         ];
     }

@@ -83,6 +83,10 @@ class Schedule
      */
     private $long;
 
+    private $description;
+
+    private $images;
+
     /**
      * Create a new entity instance.
      *
@@ -97,6 +101,8 @@ class Schedule
      * @param float    $traffic_time
      * @param float    $lat
      * @param float    $long
+     * @param string   $description
+     * @param array    $images
      */
     public function __construct(
         ?int $id,
@@ -109,7 +115,9 @@ class Schedule
         float $duration,
         float $traffic_time,
         float $lat,
-        float $long
+        float $long,
+        string $description,
+        ?array $images = []
     ) {
         $this->id = $id;
         $this->trip_id = $trip_id;
@@ -122,6 +130,8 @@ class Schedule
         $this->traffic_time = $traffic_time;
         $this->lat = $lat;
         $this->long = $long;
+        $this->description = $description;
+        $this->images = $images;
     }
 
     /**
@@ -368,6 +378,8 @@ class Schedule
                 'lat' => $this->lat,
                 'long' => $this->long,
             ],
+            'description' => $this->description,
+            'images' => $this->images,
         ];
     }
 

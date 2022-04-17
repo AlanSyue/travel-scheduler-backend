@@ -34,9 +34,7 @@ class UpdateSchedulesService
             $schedule_id = $schedule['id'];
             $description = $schedule['description'];
 
-            $this->schedule_repo->update($schedule_id, [
-                'description' => $description,
-            ]);
+            $this->schedule_repo->update($schedule_id, ['description' => $description]);
 
             $images = $schedule['images'];
 
@@ -59,5 +57,7 @@ class UpdateSchedulesService
 
             $this->schedule_repo->insertImages($schedule_id, $images_data);
         });
+
+        $this->trip_repo->update($trip_id, ['is_published' => true]);
     }
 }

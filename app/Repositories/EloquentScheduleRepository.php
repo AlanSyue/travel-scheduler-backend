@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use Trip\Entities\Schedule;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Schedule as ModelsSchedule;
 use App\Models\ScheduleImage as ModelsScheduleImage;
-use Illuminate\Support\Collection;
-use Trip\Entities\Schedule;
 
 class EloquentScheduleRepository implements ScheduleRepositoryInterface
 {
@@ -75,6 +76,7 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
     public function findByTripId(int $trip_id, ?int $day): Collection
     {
         return $this->schedule_model->where('trip_id', $trip_id)
+            ->with(['images'])
             ->when($day, function ($query, $day) {
                 return $query->where('day', $day);
             })
@@ -83,6 +85,10 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
             ->groupBy('day')
             ->map(function ($schedules) {
                 return $schedules->transform(function ($schedule) {
+                    $images = $schedule->images->map(function($image) {
+                        return env('AWS_URL') . $image->image_name;
+                    })->toArray();
+
                     return new Schedule(
                         $schedule->id,
                         $schedule->trip_id,
@@ -94,7 +100,9 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
                         $schedule->duration,
                         $schedule->traffic_time,
                         $schedule->lat,
-                        $schedule->long
+                        $schedule->long,
+                        $schedule->description,
+                        $images
                     );
                 });
             });

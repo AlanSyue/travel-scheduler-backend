@@ -14,7 +14,6 @@ return new class() extends Migration {
     {
         Schema::table('schedules', function (Blueprint $table) {
             $table->text('description')->after('long');
-            $table->boolean('is_published')->default(false)->after('long');
         });
     }
 
@@ -27,7 +26,6 @@ return new class() extends Migration {
     {
         Schema::table('schedules', function (Blueprint $table) {
             $table->dropColumn('description');
-            $table->dropColumn('is_published');
         });
     }
 };

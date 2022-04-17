@@ -14,4 +14,8 @@ interface TripRepositoryInterface
     public function insertGetId(Trip $trip): int;
 
     public function find(int $trip_id): ?Trip;
+
+    public function update(int $trip_id, array $update_data);
+
+    public function findByIsPublished(bool $is_published): Collection;
 }

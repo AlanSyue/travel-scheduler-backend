@@ -37,10 +37,22 @@ class EloquentTripRepository implements TripRepositoryInterface
     public function findByUserId(int $user_id): Collection
     {
         return $this->trip_model
+            ->with(['user'])
             ->where('user_id', $user_id)
             ->get()
             ->transform(function (ModelsTrip $trip) use ($user_id) {
-                return (new Trip($trip->id, $user_id, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
+            });
+    }
+
+    public function findByIsPublished(bool $is_published): Collection
+    {
+        return $this->trip_model
+            ->with(['user'])
+            ->where('is_published', $is_published)
+            ->get()
+            ->transform(function (ModelsTrip $trip) {
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
             });
     }
 
@@ -55,7 +67,7 @@ class EloquentTripRepository implements TripRepositoryInterface
     {
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
-        return $trip ? new Trip($trip->id, $trip->user_id, $trip->title, $trip->start_at, $trip->end_at) : null;
+        return $trip ? new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at) : null;
     }
 
     /**
@@ -73,5 +85,10 @@ class EloquentTripRepository implements TripRepositoryInterface
             'start_at' => $trip->getStartAt(),
             'end_at' => $trip->getEndAt(),
         ]);
+    }
+
+    public function update(int $trip_id, array $update_data)
+    {
+        $this->trip_model->where('id', $trip_id)->update($update_data);
     }
 }

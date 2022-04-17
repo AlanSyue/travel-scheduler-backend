@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TripController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,12 @@ Route::prefix('v1')->group(function () {
             Route::post('/{driver}/register', 'register');
             Route::post('/{driver}/login', 'login');
         });
+
+    Route::controller(HomeController::class)->group(function() {
+        Route::get('/home', 'index');
+    });
+
+
     Route::prefix('/trips')
         ->middleware('auth:api')
         ->controller(TripController::class)
