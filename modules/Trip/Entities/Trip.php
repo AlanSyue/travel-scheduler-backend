@@ -202,6 +202,7 @@ class Trip
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'days' => $this->getDays(),
             'start_date' => $this->getStartAt()->format('Y-m-d'),
             'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
