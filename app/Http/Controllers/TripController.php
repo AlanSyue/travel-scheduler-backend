@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Trip\Entities\Trip;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Trip\Services\GetDetailService;
-use Trip\Transformer\TripsTransformer;
-use Illuminate\Support\Facades\Storage;
-use Trip\Services\CreateSchedulesService;
-use Trip\Transformer\TripDetailTransformer;
 use App\Repositories\TripRepositoryInterface;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Trip\Entities\Trip;
+use Trip\Services\CreateSchedulesService;
+use Trip\Services\GetDetailService;
 use Trip\Services\UpdateSchedulesService;
+use Trip\Transformer\TripDetailTransformer;
+use Trip\Transformer\TripsTransformer;
 
 class TripController extends Controller
 {
@@ -62,9 +61,9 @@ class TripController extends Controller
         return response()->json([
             'data' => [
                 'id' => $trip_id,
-                "title" => $trip->getTitle(),
-                "start_date" => $trip->getStartAt()->format('Y-m-d'),
-                "end_date" => $trip->getEndAt()->format('Y-m-d'),
+                'title' => $trip->getTitle(),
+                'start_date' => $trip->getStartAt()->format('Y-m-d'),
+                'end_date' => $trip->getEndAt()->format('Y-m-d'),
                 'days' => $trip->getDays(),
             ],
         ]);
@@ -117,9 +116,11 @@ class TripController extends Controller
         ]);
 
         try {
-            $service->execute($trip_id, $user_id, $request->day, $request->schedules);
+            $schedules = $service->execute($trip_id, $user_id, $request->day, $request->schedules);
 
-            return response()->json();
+            return response()->json([
+                'data' => $schedules,
+            ]);
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -140,6 +141,5 @@ class TripController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
-
     }
 }

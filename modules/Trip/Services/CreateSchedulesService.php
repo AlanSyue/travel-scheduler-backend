@@ -72,5 +72,7 @@ class CreateSchedulesService
         $schedules = $this->transformer->transform($schedules, $trip_id, $day);
         $this->schedule_repo->deleteByTripId($trip_id, $day);
         $this->schedule_repo->insert($schedules);
+
+        return $schedules;
     }
 }
