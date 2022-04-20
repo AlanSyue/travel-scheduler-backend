@@ -7,6 +7,8 @@ namespace Trip\Services;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use Exception;
+use Illuminate\Support\Collection;
+use Trip\Entities\Schedule;
 use Trip\Entities\Trip;
 use Trip\Transformer\SchedulesTransformer;
 
@@ -73,6 +75,15 @@ class CreateSchedulesService
         $schedules = $this->transformer->transform($schedules, $trip_id, $day);
         $this->schedule_repo->deleteByTripId($trip_id, $day);
         $this->schedule_repo->insert($schedules);
+
+        $schedules = ($this->schedule_repo->findByTripId($trip->getId(), $day))
+            ->map(function (Collection $schedules) {
+                return $schedules->map(function (Schedule $schedule) {
+                    return $schedule->toDetailArray();
+                })->toArray();
+            })
+            ->values()
+            ->toArray();
 
         $trip->setSchedules($schedules);
 

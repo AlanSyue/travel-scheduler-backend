@@ -55,7 +55,7 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
      */
     public function insert(array $schedules)
     {
-        $schedules = collect($schedules)->map(function ($schedule) {
+        $schedules = collect($schedules)->map(function (array $schedule) {
             $schedule['created_at'] = now();
             $schedule['updated_at'] = now();
 
