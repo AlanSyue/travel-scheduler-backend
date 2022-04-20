@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TripController;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/{driver}/login', 'login');
         });
 
-    Route::controller(HomeController::class)->group(function() {
+    Route::controller(HomeController::class)->group(function () {
         Route::get('/home', 'index');
         Route::delete('/delete/{id}', 'delete');
     });
@@ -43,5 +44,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', 'detail');
             Route::post('/{id}', 'createSchedules');
             Route::patch('/{id}', 'update');
+        });
+
+    Route::prefix('/collections')
+        ->middleware('auth:api')
+        ->controller(CollectionController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'switch');
         });
 });
