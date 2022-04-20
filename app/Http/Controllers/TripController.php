@@ -116,10 +116,10 @@ class TripController extends Controller
         ]);
 
         try {
-            $schedules = $service->execute($trip_id, $user_id, $request->day, $request->schedules);
+            $trip = $service->execute($trip_id, $user_id, $request->day, $request->schedules);
 
             return response()->json([
-                'data' => $schedules,
+                'data' => $trip->toDetailArray(),
             ]);
         } catch (\Throwable $th) {
             throw $th;

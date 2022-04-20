@@ -7,6 +7,7 @@ namespace Trip\Services;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use Exception;
+use Trip\Entities\Trip;
 use Trip\Transformer\SchedulesTransformer;
 
 class CreateSchedulesService
@@ -57,9 +58,9 @@ class CreateSchedulesService
      * @param int   $day
      * @param array $schedules
      *
-     * @return void
+     * @return Trip
      */
-    public function execute(int $trip_id, int $user_id, int $day, array $schedules)
+    public function execute(int $trip_id, int $user_id, int $day, array $schedules): Trip
     {
         $trip = $this->trip_repo->find($trip_id);
 
@@ -73,6 +74,8 @@ class CreateSchedulesService
         $this->schedule_repo->deleteByTripId($trip_id, $day);
         $this->schedule_repo->insert($schedules);
 
-        return $schedules;
+        $trip->setSchedules($schedules);
+
+        return $trip;
     }
 }
