@@ -19,7 +19,9 @@ class HomeController extends Controller
      */
     public function index(TripRepositoryInterface $repo): JsonResponse
     {
-        return response()->json(['data' => $repo->findByIsPublished(true, auth('api')->user()->id)->toArray()]);
+        $user = auth('api')->user();
+
+        return response()->json(['data' => $repo->findByIsPublished(true, $user ? $user->id : null)->toArray()]);
     }
 
     public function delete(int $id, Trip $trip_model, Schedule $schedule_model, ScheduleImage $image_model)
