@@ -166,7 +166,13 @@ class TripController extends Controller
             );
 
             return response()->json([
-                'data' => $trip->toDetailArray(),
+                'data' => [
+                    'id' => $trip->getId(),
+                    'title' => $trip->getTitle(),
+                    'start_date' => $trip->getStartAt()->format('Y-m-d'),
+                    'end_date' => $trip->getEndAt()->format('Y-m-d'),
+                    'days' => $trip->getDays(),
+                ],
             ]);
         } catch (\Throwable $th) {
             throw $th;
