@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Trip\Services;
 
+use App\Events\UpdateSchedules;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use Exception;
@@ -96,6 +97,8 @@ class CreateSchedulesService
             })
             ->values()
             ->toArray();
+
+        event(new UpdateSchedules($user_id, $schedules));
 
         $trip->setSchedules($schedules);
 
