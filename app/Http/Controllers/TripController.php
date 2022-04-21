@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Repositories\TripRepositoryInterface;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Trip\Entities\Trip;
 use Trip\Services\CreateSchedulesService;
+use Trip\Services\DuplicateTripService;
 use Trip\Services\GetDetailService;
 use Trip\Services\UpdateSchedulesService;
 use Trip\Transformer\TripDetailTransformer;
@@ -38,8 +39,11 @@ class TripController extends Controller
      *
      * @return JsonResponse
      */
-    public function create(Request $request, TripRepositoryInterface $repo): JsonResponse
-    {
+    public function create(
+        Request $request,
+        TripRepositoryInterface $trip_repo,
+        UserRepositoryInterface $user_repo
+    ): JsonResponse {
         $user_id = $request->user()->id;
 
         $validated = $request->validate([
@@ -50,13 +54,13 @@ class TripController extends Controller
 
         $trip = new Trip(
             null,
-            User::find($user_id),
+            $user_repo->find($user_id),
             $request->title,
             $request->start_date,
             $request->end_date
         );
 
-        $trip_id = $repo->insertGetId($trip);
+        $trip_id = $trip_repo->insertGetId($trip);
 
         return response()->json([
             'data' => [
@@ -138,6 +142,32 @@ class TripController extends Controller
             $service->execute($trip_id, $user_id, $request->schedules);
 
             return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function duplicate(Request $request, DuplicateTripService $service)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'trip_id' => 'required|int',
+        ]);
+
+        try {
+            $trip = $service->execute(
+                $request->title,
+                $request->start_date,
+                $request->end_date,
+                $request->trip_id,
+                auth('api')->user()->id
+            );
+
+            return response()->json([
+                'data' => $trip->toDetailArray(),
+            ]);
         } catch (\Throwable $th) {
             throw $th;
         }

@@ -41,6 +41,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'create');
+            Route::post('/duplicate', 'duplicate');
             Route::get('/{id}', 'detail');
             Route::post('/{id}', 'createSchedules');
             Route::patch('/{id}', 'update');

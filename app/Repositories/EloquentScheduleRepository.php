@@ -73,7 +73,7 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
      *
      * @return Collection
      */
-    public function findByTripId(int $trip_id, ?int $day): Collection
+    public function findByTripId(int $trip_id, ?int $day = null): Collection
     {
         return $this->schedule_model->where('trip_id', $trip_id)
             ->with(['images'])

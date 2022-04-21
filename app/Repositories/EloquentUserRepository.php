@@ -55,4 +55,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             'name' => $name,
         ]);
     }
+
+    public function find(int $user_id): ?User
+    {
+        return $this->user->find($user_id);
+    }
 }
