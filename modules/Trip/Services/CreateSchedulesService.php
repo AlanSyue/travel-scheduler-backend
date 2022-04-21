@@ -98,7 +98,7 @@ class CreateSchedulesService
             ->values()
             ->toArray();
 
-        event(new UpdateSchedules($user_id, $schedules));
+        event(new UpdateSchedules($user_id, collect($schedules)->isNotEmpty()? $schedules[0] : []));
 
         $trip->setSchedules($schedules);
 
