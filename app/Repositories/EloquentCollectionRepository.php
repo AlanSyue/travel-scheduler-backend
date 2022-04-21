@@ -42,7 +42,12 @@ class EloquentCollectionRepository implements CollectionRepositoryInterface
             ->transform(function (ModelsCollection $model_collection) {
                 $trip = $model_collection->trip;
 
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
+                return $trip
+                    ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray()
+                    : null;
+            })
+            ->reject(function($trip) {
+                return is_null($trip);
             });
     }
 }
