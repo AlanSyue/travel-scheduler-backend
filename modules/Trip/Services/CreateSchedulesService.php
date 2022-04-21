@@ -8,6 +8,7 @@ use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Trip\Entities\Schedule;
 use Trip\Entities\Trip;
 use Trip\Transformer\SchedulesTransformer;
@@ -73,8 +74,19 @@ class CreateSchedulesService
         $trip_id = $trip->getId();
 
         $schedules = $this->transformer->transform($schedules, $trip_id, $day);
-        $this->schedule_repo->deleteByTripId($trip_id, $day);
-        $this->schedule_repo->insert($schedules);
+
+        DB::beginTransaction();
+
+        try {
+            $this->schedule_repo->deleteByTripId($trip_id, $day);
+            $this->schedule_repo->insert($schedules);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            throw $th;
+        }
+
+        DB::commit();
 
         $schedules = ($this->schedule_repo->findByTripId($trip->getId(), $day))
             ->map(function (Collection $schedules) {
