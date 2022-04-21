@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -13,7 +13,6 @@ class UpdateSchedules implements ShouldBroadcast
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
-
 
     private $trip_id;
 
@@ -47,6 +46,6 @@ class UpdateSchedules implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel("trip-{$this->trip_id}");
+        return new Channel('trip');
     }
 }
