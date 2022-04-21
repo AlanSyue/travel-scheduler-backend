@@ -14,7 +14,7 @@ class UpdateSchedules implements ShouldBroadcast
     use InteractsWithSockets;
     use SerializesModels;
 
-    private $trip_id;
+    public $trip_id;
 
     public $schedules;
 
