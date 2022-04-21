@@ -41,13 +41,17 @@ class EloquentTripRepository implements TripRepositoryInterface
      */
     public function findByUserId(int $user_id): Collection
     {
+        $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+
         return $this->trip_model
             ->with(['user'])
             ->where('user_id', $user_id)
             ->where('is_published', false)
             ->get()
-            ->transform(function (ModelsTrip $trip) {
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at))->toArray();
+            ->transform(function (ModelsTrip $trip) use ($collection_trip_ids) {
+                $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
+
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $is_collected))->toArray();
             });
     }
 

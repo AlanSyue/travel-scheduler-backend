@@ -19,6 +19,10 @@ class EloquentCollectionRepository implements CollectionRepositoryInterface
 
     public function insert(int $trip_id, int $user_id)
     {
+        if ($this->model_collection->where('trip_id', $trip_id)->where('user_id', $user_id)->exists()) {
+            return;
+        }
+
         $this->model_collection->insert([
             'trip_id' => $trip_id,
             'user_id' => $user_id,
@@ -48,6 +52,7 @@ class EloquentCollectionRepository implements CollectionRepositoryInterface
             })
             ->reject(function($trip) {
                 return is_null($trip);
-            });
+            })
+            ->values();
     }
 }
