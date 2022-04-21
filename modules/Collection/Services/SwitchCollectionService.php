@@ -20,7 +20,7 @@ class SwitchCollectionService
         if ($is_collected) {
             $this->repo->insert($trip_id, $user_id);
         } else {
-            $this->repo->delete($user_id, $trip_id);
+            $this->repo->delete($trip_id, $user_id);
         }
     }
 }
