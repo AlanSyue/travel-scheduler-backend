@@ -19,14 +19,14 @@ class HomeController extends Controller
      */
     public function index(TripRepositoryInterface $repo): JsonResponse
     {
-        return response()->json(['data' => $repo->findByIsPublished(true)->toArray()]);
+        return response()->json(['data' => $repo->findByIsPublished(true, auth('api')->user()->id)->toArray()]);
     }
 
     public function delete(int $id, Trip $trip_model, Schedule $schedule_model, ScheduleImage $image_model)
     {
         $trip = $trip_model->find($id);
         if (! $trip) {
-            throw new \Exception("無此 trip", 1);
+            throw new \Exception('無此 trip', 1);
         }
 
         $schedule_ids = $schedule_model->where('trip_id', $id)->get()->pluck('id')->toArray();

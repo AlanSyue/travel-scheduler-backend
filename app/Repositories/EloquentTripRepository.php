@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Models\Collection as ModelsCollection;
 use App\Models\Trip as ModelsTrip;
 use Illuminate\Support\Collection;
 use Trip\Entities\Trip;
@@ -17,14 +18,18 @@ class EloquentTripRepository implements TripRepositoryInterface
      */
     private $trip_model;
 
+    private $collection_model;
+
     /**
      * Create a new repository instance.
      *
      * @param ModelsTrip $trip_model
+     * @param ModelsCollection $collection_model
      */
-    public function __construct(ModelsTrip $trip_model)
+    public function __construct(ModelsTrip $trip_model, ModelsCollection $collection_model)
     {
         $this->trip_model = $trip_model;
+        $this->collection_model = $collection_model;
     }
 
     /**
@@ -50,18 +55,23 @@ class EloquentTripRepository implements TripRepositoryInterface
      * Find by is published column.
      *
      * @param bool $is_published
+     * @param int|null $user_id
      *
      * @return Collection
      */
-    public function findByIsPublished(bool $is_published): Collection
+    public function findByIsPublished(bool $is_published, ?int $user_id = null): Collection
     {
+        $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+
         return $this->trip_model
             ->with(['user'])
             ->where('is_published', $is_published)
             ->orderBy('updated_at', 'desc')
             ->get()
-            ->transform(function (ModelsTrip $trip) {
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
+            ->transform(function (ModelsTrip $trip) use ($collection_trip_ids) {
+                $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
+
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $is_collected))->toArray();
             });
     }
 

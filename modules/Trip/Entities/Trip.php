@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Trip\Entities;
 
-use Carbon\Carbon;
 use App\Models\User;
+use Carbon\Carbon;
 
 class Trip
 {
@@ -59,21 +59,30 @@ class Trip
     private $schedules = [];
 
     /**
+     * Determine the trip is collected or not.
+     *
+     * @var bool
+     */
+    private $is_collected;
+
+    /**
      * Create a new entity instance.
      *
      * @param null|int $id
-     * @param User      $user
+     * @param User     $user
      * @param string   $title
      * @param string   $start_at
      * @param string   $end_at
+     * @param bool     $is_collected
      */
-    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at)
+    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_collected = false)
     {
         $this->id = $id;
         $this->user = $user;
         $this->title = $title;
         $this->start_at = $start_at;
         $this->end_at = $end_at;
+        $this->is_collected = $is_collected;
     }
 
     /**
@@ -188,6 +197,7 @@ class Trip
                 'name' => $this->user->name,
                 'image_url' => $this->user->image_url ?? '',
             ],
+            'is_collected' => $this->is_collected,
             'editors' => $this->editors,
         ];
     }
@@ -206,6 +216,7 @@ class Trip
             'start_date' => $this->getStartAt()->format('Y-m-d'),
             'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
+            'is_collected' => $this->is_collected,
             'schedules' => $this->schedules,
         ];
     }
