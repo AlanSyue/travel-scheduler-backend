@@ -47,7 +47,7 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->where('is_published', false)
             ->get()
             ->transform(function (ModelsTrip $trip) {
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->editors))->toArray();
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at))->toArray();
             });
     }
 
