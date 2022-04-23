@@ -114,11 +114,6 @@ class TripController extends Controller
     {
         $user_id = $request->user()->id;
 
-        $validated = $request->validate([
-            'day' => 'required|int',
-            'schedules' => 'required|array',
-        ]);
-
         try {
             $trip = $service->execute($trip_id, $user_id, $request->day, $request->schedules);
 
