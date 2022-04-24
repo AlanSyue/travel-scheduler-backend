@@ -20,14 +20,12 @@ class CreateVideoService
 
     public function execute(int $user_id, UploadedFile $video)
     {
-        $video_name = Str::random(8) . time() . '.MOV';
-
-        $response = Storage::disk('s3')->put($video_name, $video, [
+        $response = Storage::disk('s3')->put('videos', $video, [
             'visibility' => 'public',
         ]);
 
         if ($response) {
-            $this->repo->create($user_id, $video_name);
+            $this->repo->create($user_id, $response);
         }
     }
 }

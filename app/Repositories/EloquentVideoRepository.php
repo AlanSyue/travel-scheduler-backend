@@ -27,7 +27,7 @@ class EloquentVideoRepository implements VideoRepositoryInterface
             });
     }
 
-    public function create(int $user_id, string $video_name)
+    public function create(int $user_id, mixed $video_name)
     {
         $this->video_model->user_id = $user_id;
         $this->video_model->name = $video_name;

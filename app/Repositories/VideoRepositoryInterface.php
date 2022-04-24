@@ -10,5 +10,5 @@ interface VideoRepositoryInterface
 {
     public function findMany(): Collection;
 
-    public function create(int $user_id, string $video_name);
+    public function create(int $user_id, mixed $video_name);
 }
