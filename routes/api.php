@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,9 +33,6 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(HomeController::class)->group(function () {
         Route::get('/home', 'index');
-        Route::post('/video', function() {
-            echo 'success';
-        });
         Route::delete('/delete/{id}', 'delete');
     });
 
@@ -56,5 +54,12 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'switch');
+        });
+
+    Route::prefix('/videos')
+        ->controller(VideoController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::middleware('auth:api')->post('/', 'create');
         });
 });
