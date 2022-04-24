@@ -39,6 +39,9 @@ class UpdateSchedulesService
             $images = $schedule['images'];
 
             $images_data = collect($images)->map(function ($image) use ($schedule_id) {
+                if (Str::contains($image, env('AWS_URL'))) {
+                    return;
+                }
                 $image_name = Str::random(8) . time();
                 $image = base64_decode($image);
                 $response = Storage::disk('s3')->put($image_name, $image, [
@@ -53,9 +56,16 @@ class UpdateSchedulesService
                         'updated_at' => now(),
                     ];
                 }
-            })->values()->toArray();
+            })
+            ->reject(function($image_data) {
+                return !$image_data;
+            })
+            ->values()
+            ->toArray();
 
-            $this->schedule_repo->insertImages($schedule_id, $images_data);
+            if (count($images_data) > 0) {
+                $this->schedule_repo->insertImages($schedule_id, $images_data);
+            }
         });
 
         $this->trip_repo->update($trip_id, ['is_published' => true]);
