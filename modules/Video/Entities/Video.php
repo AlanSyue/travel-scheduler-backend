@@ -27,7 +27,7 @@ class Video implements Arrayable
                 'name' => $this->user->name,
                 'image_url' => '',
             ],
-            'name' => env('AWS_URL') . $this->name,
+            'url' => env('AWS_URL') . $this->name,
         ];
     }
 }

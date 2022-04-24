@@ -13,7 +13,9 @@ class VideoController extends Controller
         try {
             $videos = $service->execute();
 
-            return response()->json($videos->toArray());
+            return response()->json([
+                'data' => $videos->toArray(),
+            ]);
         } catch (\Throwable $th) {
             throw $th;
         }
