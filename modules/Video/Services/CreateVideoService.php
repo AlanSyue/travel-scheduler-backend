@@ -20,7 +20,7 @@ class CreateVideoService
 
     public function execute(int $user_id, UploadedFile $video)
     {
-        $video_name = Str::random(8) . time();
+        $video_name = Str::random(8) . time() . 'MOV';
 
         $response = Storage::disk('s3')->put($video_name, $video, [
             'visibility' => 'public',
