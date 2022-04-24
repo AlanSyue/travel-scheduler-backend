@@ -21,6 +21,7 @@ class EloquentVideoRepository implements VideoRepositoryInterface
     {
         return $this->video_model
             ->with(['user'])
+            ->orderBy('id', 'desc')
             ->get()
             ->map(function($video) {
                 return new Video($video->user, $video->name);
