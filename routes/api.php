@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(HomeController::class)->group(function () {
         Route::get('/home', 'index');
+        Route::post('/search', 'search');
         Route::delete('/delete/{id}', 'delete');
     });
 

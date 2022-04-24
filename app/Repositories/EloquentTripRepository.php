@@ -93,6 +93,19 @@ class EloquentTripRepository implements TripRepositoryInterface
         return $trip ? new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at) : null;
     }
 
+    public function findMany(array $trip_ids, $is_published = true): Collection
+    {
+        return $this->trip_model
+            ->with(['user'])
+            ->whereIn('id', $trip_ids)
+            ->where('is_published', $is_published)
+            ->orderBy('updated_at', 'desc')
+            ->get()
+            ->transform(function (ModelsTrip $trip) {
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at))->toArray();
+            });
+    }
+
     /**
      * Insert and get ID.
      *

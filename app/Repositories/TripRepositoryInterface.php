@@ -15,6 +15,8 @@ interface TripRepositoryInterface
 
     public function find(int $trip_id): ?Trip;
 
+    public function findMany(array $trip_ids): Collection;
+
     public function update(int $trip_id, array $update_data);
 
     public function findByIsPublished(bool $is_published, ?int $user_id): Collection;

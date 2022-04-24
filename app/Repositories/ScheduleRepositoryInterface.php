@@ -17,4 +17,6 @@ interface ScheduleRepositoryInterface
     public function update(int $schedule_id, array $update_data);
 
     public function insertImages(int $schedule_id, array $images);
+
+    public function searchByName(string $word): Collection;
 }

@@ -119,4 +119,9 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
         $this->schedule_image_model->where('schedule_id', $schedule_id)->delete();
         $this->schedule_image_model->insert($images);
     }
+
+    public function searchByName(string $word): Collection
+    {
+        return $this->schedule_model->where('name', 'regexp', $word)->get();
+    }
 }

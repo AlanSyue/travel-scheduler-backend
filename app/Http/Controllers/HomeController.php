@@ -7,6 +7,8 @@ use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Repositories\TripRepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Trip\Services\SearchTripsService;
 
 class HomeController extends Controller
 {
@@ -22,6 +24,21 @@ class HomeController extends Controller
         $user = auth('api')->user();
 
         return response()->json(['data' => $repo->findByIsPublished(true, $user ? $user->id : null)->toArray()]);
+    }
+
+    public function search(Request $request, SearchTripsService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'word' => 'required|string',
+        ]);
+
+        $word = $request->word;
+
+        $trips = $service->execute($word);
+
+        return response()->json([
+            'data' => $trips->toArray(),
+        ]);
     }
 
     public function delete(int $id, Trip $trip_model, Schedule $schedule_model, ScheduleImage $image_model)
