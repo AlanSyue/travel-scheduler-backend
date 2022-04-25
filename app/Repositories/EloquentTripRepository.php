@@ -68,14 +68,25 @@ class EloquentTripRepository implements TripRepositoryInterface
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
 
         return $this->trip_model
-            ->with(['user'])
+            ->with(['user', 'likes', 'comments'])
             ->where('is_published', $is_published)
             ->orderBy('updated_at', 'desc')
             ->get()
-            ->transform(function (ModelsTrip $trip) use ($collection_trip_ids) {
-                $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
+            ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids) {
+                $is_collected = in_array($trip_model->id, $collection_trip_ids) ? true : false;
 
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $is_collected))->toArray();
+                $trip = (new Trip(
+                    $trip_model->id,
+                    $trip_model->user,
+                    $trip_model->title,
+                    $trip_model->start_at,
+                    $trip_model->end_at,
+                    $is_collected
+                ))
+                    ->setLikesCount($trip_model->likes->count())
+                    ->setCommentsCount($trip_model->comments->count());
+
+                return $trip->toArray();
             });
     }
 

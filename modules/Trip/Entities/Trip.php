@@ -65,6 +65,10 @@ class Trip
      */
     private $is_collected;
 
+    private $likes_count = 0;
+
+    private $comments_count = 0;
+
     /**
      * Create a new entity instance.
      *
@@ -198,6 +202,8 @@ class Trip
                 'image_url' => $this->user->image_url ?? '',
             ],
             'is_collected' => $this->is_collected,
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
             'editors' => $this->editors,
         ];
     }
@@ -217,6 +223,8 @@ class Trip
             'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
             'is_collected' => $this->is_collected,
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
             'schedules' => $this->schedules,
         ];
     }
@@ -289,6 +297,20 @@ class Trip
     public function setSchedules($schedules): self
     {
         $this->schedules = $schedules;
+
+        return $this;
+    }
+
+    public function setLikesCount(int $likes_count): self
+    {
+        $this->likes_count = $likes_count;
+
+        return $this;
+    }
+
+    public function setCommentsCount(int $comments_count): self
+    {
+        $this->$comments_count = $comments_count;
 
         return $this;
     }

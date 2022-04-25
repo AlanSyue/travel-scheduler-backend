@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\CommentRepositoryInterface;
+use App\Repositories\LikeRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\JsonResponse;
@@ -169,6 +171,54 @@ class TripController extends Controller
                     'days' => $trip->getDays(),
                 ],
             ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function addLikes(int $trip_id, LikeRepositoryInterface $like_repo)
+    {
+        try {
+            $like_repo->save($trip_id, auth('api')->user()->id);
+
+            return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function deleteLikes(int $trip_id, LikeRepositoryInterface $like_repo)
+    {
+        try {
+            $like_repo->delete($trip_id, auth('api')->user()->id);
+
+            return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function addComments(int $trip_id, Request $request, CommentRepositoryInterface $comment_repo)
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        try {
+            $comment_repo->save($trip_id, auth('api')->user()->id, $request->content);
+
+            return response()->json();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function deleteComments(int $trip_id, int $comment_id, CommentRepositoryInterface $comment_repo)
+    {
+        try {
+            $comment_repo->delete($trip_id, auth('api')->user()->id, $comment_id);
+
+            return response()->json();
         } catch (\Throwable $th) {
             throw $th;
         }

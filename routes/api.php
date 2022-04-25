@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
@@ -38,15 +39,26 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('/trips')
-        ->middleware('auth:api')
-        ->controller(TripController::class)
         ->group(function () {
-            Route::get('/', 'index');
-            Route::post('/', 'create');
-            Route::post('/duplicate', 'duplicate');
-            Route::get('/{id}', 'detail');
-            Route::post('/{id}', 'createSchedules');
-            Route::patch('/{id}', 'update');
+            Route::middleware('auth:api')
+                ->controller(TripController::class)
+                ->group(function () {
+                    Route::get('/', 'index');
+                    Route::post('/', 'create');
+                    Route::post('/duplicate', 'duplicate');
+                    Route::get('/{id}', 'detail');
+                    Route::post('/{id}', 'createSchedules');
+                    Route::patch('/{id}', 'update');
+                    Route::post('/{id}/likes', 'addLikes');
+                    Route::delete('/{id}/likes', 'deleteLikes');
+                    Route::post('/{id}/comments', 'addComments');
+                    Route::delete('/{id}/comments/{comment_id}', 'deleteComments');
+                });
+            Route::controller(ReactionController::class)
+                ->group(function () {
+                    Route::get('/{id}/likes', 'getLikeUsers');
+                    Route::get('/{id}/comments', 'getComments');
+                });
         });
 
     Route::prefix('/collections')
