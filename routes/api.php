@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::post('/{driver}/register', 'register');
             Route::post('/{driver}/login', 'login');
+            Route::patch('/email/reset', 'resetPassword');
         });
 
     Route::controller(HomeController::class)->group(function () {
