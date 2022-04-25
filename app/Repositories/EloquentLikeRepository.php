@@ -28,6 +28,10 @@ class EloquentLikeRepository implements LikeRepositoryInterface
 
     public function save(int $trip_id, int $user_id)
     {
+        $has_liked = $this->like_model->where('trip_id', $trip_id)->where('user_id', $user_id)->exists();
+        if ($has_liked) {
+            return;
+        }
         $this->like_model->trip_id = $trip_id;
         $this->like_model->user_id = $user_id;
         $this->like_model->save();
