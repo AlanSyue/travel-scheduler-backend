@@ -199,7 +199,7 @@ class Trip
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
-                'image_url' => $this->user->image_url ?? '',
+                'image_url' => $this->user->image_name ? env('AWS_URL') . $this->user->image_name : '',
             ],
             'is_collected' => $this->is_collected,
             'likes_count' => $this->likes_count,

@@ -6,6 +6,7 @@ use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Repositories\TripRepositoryInterface;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Trip\Services\SearchTripsService;

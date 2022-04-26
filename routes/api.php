@@ -5,6 +5,7 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,8 +29,9 @@ Route::prefix('v1')->group(function () {
     Route::prefix('/auth')
         ->controller(AuthController::class)
         ->group(function () {
-            Route::post('/{driver}/register', 'register');
-            Route::post('/{driver}/login', 'login');
+            Route::post('/email/register', 'register');
+            Route::post('/apple/login', 'appleLogin');
+            Route::post('/email/login', 'login');
             Route::patch('/email/reset', 'resetPassword');
         });
 
@@ -38,6 +40,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/search', 'search');
         Route::delete('/delete/{id}', 'delete');
     });
+
+    Route::controller(UserController::class)
+        ->prefix('user')
+        // ->middleware('auth:api')
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::patch('/', 'update');
+            Route::delete('/', 'delete');
+        });
+
 
     Route::prefix('/trips')
         ->group(function () {

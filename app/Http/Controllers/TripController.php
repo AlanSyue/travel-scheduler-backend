@@ -6,6 +6,7 @@ use App\Repositories\CommentRepositoryInterface;
 use App\Repositories\LikeRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Trip\Entities\Trip;
@@ -204,10 +205,24 @@ class TripController extends Controller
             'content' => 'required|string',
         ]);
 
-        try {
-            $comment_repo->save($trip_id, auth('api')->user()->id, $request->content);
+        $user = auth('api')->user();
 
-            return response()->json();
+        try {
+            $comment = $comment_repo->save($trip_id, $user->id, $request->content);
+
+            return response()->json([
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+                    ],
+                    'id' => $comment->id,
+                    'content' => $comment->content,
+                    'comment_by_me' => true,
+                    'duration' => Carbon::parse($comment->created_at)->diffInMinutes(Carbon::now()),
+                ],
+            ]);
         } catch (\Throwable $th) {
             throw $th;
         }

@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
+use Exception;
+use Throwable;
 use App\Models\User;
-use Auth\Requests\AuthRequest;
-use Auth\Services\EmailLoginService;
-use Auth\Services\EmailRegisterService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
+use Auth\Requests\AuthRequest;
 use Illuminate\Support\Facades\Log;
-use Throwable;
+use App\Http\Controllers\Controller;
+use Auth\Services\EmailLoginService;
+use Illuminate\Support\Facades\Hash;
+use Auth\Services\EmailRegisterService;
+use Laravel\Socialite\Facades\Socialite;
+use App\Repositories\UserRepositoryInterface;
 
 class AuthController extends Controller
 {
@@ -75,5 +78,56 @@ class AuthController extends Controller
 
             throw $th;
         }
+    }
+
+    public function appleLogin(Request $request, EmailLoginService $service)
+    {
+        $provider = 'apple';
+        $token = $request->token;
+
+        $social_user = Socialite::driver($provider)->userFromToken($token);
+        $user = $this->getLocalUser($social_user);
+
+        try {
+            return $service->execute($user->email, $social_user->id);
+        } catch (Throwable $th) {
+            Log::error($th->getMessage());
+
+            throw $th;
+        }
+    }
+
+    /**
+     * @param OAuthTwoUser $socialUser
+     * @param mixed        $social_user
+     *
+     * @return null|User
+     */
+    private function getLocalUser($social_user): ?User
+    {
+        $user = User::where('email', $social_user->email)->first();
+
+        if (! $user) {
+            $user = $this->registerAppleUser($social_user);
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param OAuthTwoUser $socialUser
+     * @param mixed        $social_user
+     *
+     * @return null|User
+     */
+    private function registerAppleUser($social_user): ?User
+    {
+        $user = User::create([
+            'name' => $social_user->name ? $social_user->name : '新訪客',
+            'email' => $social_user->email,
+            'password' => Hash::make($social_user->id),
+        ]);
+
+        return $user;
     }
 }

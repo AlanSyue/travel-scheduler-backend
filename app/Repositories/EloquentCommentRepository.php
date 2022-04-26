@@ -27,6 +27,8 @@ class EloquentCommentRepository implements CommentRepositoryInterface
         $this->comment_model->user_id = $user_id;
         $this->comment_model->content = $content;
         $this->comment_model->save();
+
+        return $this->comment_model;
     }
 
     public function delete(int $trip_id, int $user_id, int $comment_id)
