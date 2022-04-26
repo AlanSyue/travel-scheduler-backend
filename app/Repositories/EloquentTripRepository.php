@@ -101,7 +101,11 @@ class EloquentTripRepository implements TripRepositoryInterface
     {
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
-        return $trip ? new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at) : null;
+        return $trip
+            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at))
+                ->setLikesCount($trip->likes->count())
+               ->setCommentsCount($trip->comments->count())
+            : null;
     }
 
     public function findMany(array $trip_ids, $is_published = true): Collection
