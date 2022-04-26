@@ -90,7 +90,8 @@ class EloquentTripRepository implements TripRepositoryInterface
                     $trip_model->title,
                     $trip_model->start_at,
                     $trip_model->end_at,
-                    $is_collected
+                    $is_collected,
+                    $is_liked
                 ))
                     ->setLikesCount($trip_model->likes->count())
                     ->setCommentsCount($trip_model->comments->count());
