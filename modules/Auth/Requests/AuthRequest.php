@@ -43,7 +43,6 @@ class AuthRequest extends FormRequest
             'email' => 'required|string',
             'password' => 'required|string',
             'name' => 'required|string',
-            'driver' => [new Enum(AuthDriver::class)],
         ];
     }
 
@@ -100,7 +99,7 @@ class AuthRequest extends FormRequest
             $this->email,
             $this->password,
             $this->name,
-            $this->driver
+            'email'
         );
     }
 }
