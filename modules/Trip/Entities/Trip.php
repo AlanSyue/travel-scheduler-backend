@@ -69,6 +69,8 @@ class Trip
 
     private $comments_count = 0;
 
+    private $is_liked;
+
     /**
      * Create a new entity instance.
      *
@@ -78,8 +80,9 @@ class Trip
      * @param string   $start_at
      * @param string   $end_at
      * @param bool     $is_collected
+     * @param bool     $is_liked
      */
-    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_collected = false)
+    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_collected = false, bool $is_liked = false)
     {
         $this->id = $id;
         $this->user = $user;
@@ -87,6 +90,7 @@ class Trip
         $this->start_at = $start_at;
         $this->end_at = $end_at;
         $this->is_collected = $is_collected;
+        $this->is_liked = $is_liked;
     }
 
     /**
@@ -202,6 +206,7 @@ class Trip
                 'image_url' => $this->user->image_name ? env('AWS_URL') . $this->user->image_name : '',
             ],
             'is_collected' => $this->is_collected,
+            'is_liked' => $this->is_liked,
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'editors' => $this->editors,
@@ -223,6 +228,7 @@ class Trip
             'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
             'is_collected' => $this->is_collected,
+            'is_liked' => $this->is_liked,
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'schedules' => $this->schedules,
@@ -310,7 +316,7 @@ class Trip
 
     public function setCommentsCount(int $comments_count): self
     {
-        $this->$comments_count = $comments_count;
+        $this->{$comments_count} = $comments_count;
 
         return $this;
     }
