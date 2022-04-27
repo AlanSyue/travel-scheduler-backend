@@ -59,7 +59,7 @@ class GetDetailService
             throw new Exception('找不到這個 trip', 1);
         }
 
-        if ($user_id !== $trip->getUserId()) {
+        if (! $trip->getIsPublished() && $trip->$user_id !== $trip->getUserId()) {
             throw new Exception('不是你的 trip', 1);
         }
 

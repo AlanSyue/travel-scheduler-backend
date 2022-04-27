@@ -71,6 +71,8 @@ class Trip
 
     private $is_liked;
 
+    private $is_published;
+
     /**
      * Create a new entity instance.
      *
@@ -81,8 +83,9 @@ class Trip
      * @param string   $end_at
      * @param bool     $is_collected
      * @param bool     $is_liked
+     * @param bool     $is_published
      */
-    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_collected = false, bool $is_liked = false)
+    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_published, bool $is_collected = false, bool $is_liked = false)
     {
         $this->id = $id;
         $this->user = $user;
@@ -91,6 +94,7 @@ class Trip
         $this->end_at = $end_at;
         $this->is_collected = $is_collected;
         $this->is_liked = $is_liked;
+        $this->is_published = $is_published;
     }
 
     /**
@@ -319,5 +323,10 @@ class Trip
         $this->comments_count = $comments_count;
 
         return $this;
+    }
+
+    public function getIsPublished(): bool
+    {
+        return $this->is_published;
     }
 }

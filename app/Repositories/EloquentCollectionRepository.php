@@ -47,7 +47,7 @@ class EloquentCollectionRepository implements CollectionRepositoryInterface
                 $trip = $model_collection->trip;
 
                 return $trip
-                    ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at))->toArray()
+                    ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published))->toArray()
                     : null;
             })
             ->reject(function($trip) {

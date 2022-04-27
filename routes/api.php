@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(UserController::class)
         ->prefix('user')
-        // ->middleware('auth:api')
+        ->middleware('auth:api')
         ->group(function () {
             Route::get('/', 'index');
             Route::patch('/', 'update');
