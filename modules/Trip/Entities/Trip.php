@@ -316,7 +316,7 @@ class Trip
 
     public function setCommentsCount(int $comments_count): self
     {
-        $this->$comments_count = $comments_count;
+        $this->comments_count = $comments_count;
 
         return $this;
     }
