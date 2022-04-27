@@ -83,9 +83,9 @@ class Trip
      * @param string   $end_at
      * @param bool     $is_collected
      * @param bool     $is_liked
-     * @param bool     $is_published
+     * @param int      $is_published
      */
-    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, bool $is_published, bool $is_collected = false, bool $is_liked = false)
+    public function __construct(?int $id, User $user, string $title, string $start_at, string $end_at, int $is_published, bool $is_collected = false, bool $is_liked = false)
     {
         $this->id = $id;
         $this->user = $user;
@@ -327,6 +327,6 @@ class Trip
 
     public function getIsPublished(): bool
     {
-        return $this->is_published;
+        return $this->is_published === 1 ? true : false;
     }
 }
