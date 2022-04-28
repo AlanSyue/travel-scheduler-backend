@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -82,5 +83,25 @@ class UserController extends Controller
         Trip::where('user_id', $user_id)->delete();
 
         $user->delete();
+    }
+
+    public function find(int $user_id, UserRepositoryInterface $repo)
+    {
+        $user = $repo->find($user_id);
+
+        if (! $user) {
+            return response()->json([
+                'data' => [],
+            ]);
+        }
+
+        return response()->json([
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+            ],
+        ]);
+
     }
 }

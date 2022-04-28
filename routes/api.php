@@ -43,11 +43,15 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(UserController::class)
         ->prefix('user')
-        ->middleware('auth:api')
         ->group(function () {
-            Route::get('/', 'index');
-            Route::patch('/', 'update');
-            Route::delete('/', 'delete');
+            Route::middleware('auth:api')
+                ->group(function() {
+                    Route::get('/', 'index');
+                    Route::patch('/', 'update');
+                    Route::delete('/', 'delete');
+
+                });
+            Route::get('/{id}', 'find');
         });
 
 
