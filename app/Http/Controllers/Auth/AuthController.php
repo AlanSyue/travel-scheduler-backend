@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Auth\Services\EmailRegisterService;
 use Laravel\Socialite\Facades\Socialite;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
@@ -67,12 +68,12 @@ class AuthController extends Controller
      * @param Request           $request
      * @param EmailLoginService $service
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function login(Request $request, EmailLoginService $service): Response
+    public function login(Request $request, EmailLoginService $service): JsonResponse
     {
         try {
-            return $service->execute($request->email, $request->password);
+           return response()->json($service->execute($request->email, $request->password));
         } catch (Throwable $th) {
             Log::error($th->getMessage());
 
@@ -89,7 +90,7 @@ class AuthController extends Controller
         $user = $this->getLocalUser($social_user);
 
         try {
-            return $service->execute($user->email, $social_user->id);
+            return response()->json($service->execute($user->email, $social_user->id));
         } catch (Throwable $th) {
             Log::error($th->getMessage());
 

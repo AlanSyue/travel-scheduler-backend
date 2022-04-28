@@ -46,7 +46,6 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::middleware('auth:api')
                 ->group(function() {
-                    Route::get('/', 'index');
                     Route::patch('/', 'update');
                     Route::delete('/', 'delete');
 
