@@ -13,4 +13,6 @@ interface UserRepositoryInterface
     public function create(string $email, string $password, string $name);
 
     public function find(int $user_id): ?User;
+
+    public function findMany(array $user_ids);
 }

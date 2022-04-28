@@ -45,14 +45,16 @@ Route::prefix('v1')->group(function () {
         ->prefix('user')
         ->group(function () {
             Route::middleware('auth:api')
-                ->group(function() {
+                ->group(function () {
                     Route::patch('/', 'update');
                     Route::delete('/', 'delete');
-
+                    Route::post('/{id}/invite', 'invite');
+                    Route::post('/{id}/reply', 'reply');
+                    Route::get('/friends', 'getFriends');
+                    Route::get('/invites', 'getInvites');
                 });
             Route::get('/{id}', 'find');
         });
-
 
     Route::prefix('/trips')
         ->group(function () {

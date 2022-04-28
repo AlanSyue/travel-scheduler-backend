@@ -60,4 +60,9 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         return $this->user->find($user_id);
     }
+
+    public function findMany(array $user_ids)
+    {
+        return $this->user->whereIn('id', $user_ids)->get();
+    }
 }
