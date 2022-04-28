@@ -67,10 +67,11 @@ class EloquentTripRepository implements TripRepositoryInterface
      *
      * @param bool     $is_published
      * @param null|int $user_id
+     * @param null|int $filter_user_id
      *
      * @return Collection
      */
-    public function findByIsPublished(bool $is_published, ?int $user_id = null): Collection
+    public function findByIsPublished(bool $is_published, ?int $user_id = null, ?int $filter_user_id = null): Collection
     {
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
         $like_trip_ids = $user_id ? $this->like_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
@@ -78,6 +79,9 @@ class EloquentTripRepository implements TripRepositoryInterface
         return $this->trip_model
             ->with(['user', 'likes', 'comments'])
             ->where('is_published', $is_published)
+            ->when($filter_user_id, function ($query, $filter_user_id) {
+                return $query->where('user_id', $filter_user_id);
+            })
             ->orderBy('updated_at', 'desc')
             ->get()
             ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids) {

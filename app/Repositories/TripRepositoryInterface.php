@@ -19,5 +19,5 @@ interface TripRepositoryInterface
 
     public function update(int $trip_id, array $update_data);
 
-    public function findByIsPublished(bool $is_published, ?int $user_id): Collection;
+    public function findByIsPublished(bool $is_published, ?int $user_id = null, ?int $filter_user_id = null): Collection;
 }

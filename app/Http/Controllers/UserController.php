@@ -10,6 +10,7 @@ use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Models\User;
 use App\Repositories\FriendRepositoryInterface;
+use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -133,6 +134,13 @@ class UserController extends Controller
         return response()->json([
             'data' => $friends,
         ]);
+    }
+
+    public function findTrips(int $target_user_id, TripRepositoryInterface $repo)
+    {
+        $user = auth('api')->user();
+
+        return response()->json(['data' => $repo->findByIsPublished(true, $user ? $user->id : null, $target_user_id)->toArray()]);
     }
 
     public function delete()

@@ -54,6 +54,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/invites', 'getInvites');
                 });
             Route::get('/{id}', 'find');
+            Route::get('/{id}/trips', 'findTrips');
         });
 
     Route::prefix('/trips')
