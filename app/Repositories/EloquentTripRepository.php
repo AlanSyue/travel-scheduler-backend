@@ -79,8 +79,7 @@ class EloquentTripRepository implements TripRepositoryInterface
         return $this->trip_model
             ->with(['user', 'likes', 'comments'])
             ->where('is_published', $is_published)
-            ->where('is_private', $is_private)
-            ->when(! is_null($is_private), function ($query, $is_private) {
+            ->when($is_private, function ($query, $is_private) {
                 return $query->where('is_private', $is_private);
             })
             ->when($filter_user_id, function ($query, $filter_user_id) {
