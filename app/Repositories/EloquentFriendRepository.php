@@ -47,4 +47,9 @@ class EloquentFriendRepository implements FriendRepositoryInterface
     {
         return $this->friend_model->where('friend_user_id', $friend_ids)->where('is_active', $is_active)->get();
     }
+
+    public function isMyFriend(int $user_id, int $target_user_id): bool
+    {
+        return $this->friend_model->where('user_id', $user_id)->where('friend_user_id', $target_user_id)->exists();
+    }
 }

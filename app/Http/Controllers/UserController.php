@@ -22,28 +22,21 @@ class UserController extends Controller
     {
         $target_user = $repo->find($target_user_id);
 
-        /** @var User $user */
-        $user = auth('api')->user();
-
-        $friend_ids = [];
-        if ($user) {
-            $user_id = $user->id;
-            $friend_ids = $friend_repo->findMany($user_id, true)->pluck('friend_user_id')->toArray();
-            $friend_ids[] = $user_id;
-        }
-
         if (! $target_user) {
             return response()->json([
                 'data' => [],
             ]);
         }
 
+        /** @var User $user */
+        $user = auth('api')->user();
+
         return response()->json([
             'data' => [
                 'id' => $target_user->id,
                 'name' => $target_user->name,
                 'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
-                'is_friend' => in_array($target_user->id, $friend_ids),
+                'is_friend' => $user && $friend_repo->isMyFriend($user->id, $target_user_id) ? true : false,
                 'friends_count' => $target_user->friends->count(),
             ],
         ]);
@@ -148,11 +141,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function findTrips(int $target_user_id, TripRepositoryInterface $repo)
+    public function findTrips(int $target_user_id, TripRepositoryInterface $repo, FriendRepositoryInterface $friend_repo)
     {
         $user = auth('api')->user();
 
-        return response()->json(['data' => $repo->findByIsPublished(true, $user ? $user->id : null, $target_user_id)->toArray()]);
+        $can_see_private = $user && $friend_repo->isMyFriend($user->id, $target_user_id) ? null : false;
+
+        return response()->json(['data' => $repo->findByIsPublished(true, $can_see_private, $user ? $user->id : null, $target_user_id)->toArray()]);
     }
 
     public function delete()
