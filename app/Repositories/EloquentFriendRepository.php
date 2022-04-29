@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use Illuminate\Support\Collection;
 use App\Models\Friend as ModelsFriend;
 
 class EloquentFriendRepository implements FriendRepositoryInterface
@@ -37,7 +38,7 @@ class EloquentFriendRepository implements FriendRepositoryInterface
             ->update(['is_active' => $is_active]);
     }
 
-    public function findMany(int $user_id, bool $is_active)
+    public function findMany(int $user_id, bool $is_active): Collection
     {
         return $this->friend_model->where('user_id', $user_id)->where('is_active', $is_active)->get();
     }

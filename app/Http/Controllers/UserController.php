@@ -18,11 +18,21 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function find(int $user_id, UserRepositoryInterface $repo)
+    public function find(int $target_user_id, UserRepositoryInterface $repo, FriendRepositoryInterface $friend_repo)
     {
-        $user = $repo->find($user_id);
+        $target_user = $repo->find($target_user_id);
 
-        if (! $user) {
+        /** @var User $user */
+        $user = auth('api')->user();
+
+        $friend_ids = [];
+        if ($user) {
+            $user_id = $user->id;
+            $friend_ids = $friend_repo->findMany($user_id, true)->pluck('friend_user_id')->toArray();
+            $friend_ids[] = $user_id;
+        }
+
+        if (! $target_user) {
             return response()->json([
                 'data' => [],
             ]);
@@ -30,9 +40,10 @@ class UserController extends Controller
 
         return response()->json([
             'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+                'id' => $target_user->id,
+                'name' => $target_user->name,
+                'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
+                'is_friend' => in_array($target_user->id, $friend_ids),
             ],
         ]);
     }
