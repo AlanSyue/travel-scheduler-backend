@@ -86,7 +86,7 @@ class Trip
      * @param bool     $is_collected
      * @param bool     $is_liked
      * @param int      $is_published
-     * @param string   $updated_at
+     * @param Carbon   $updated_at
      */
     public function __construct(
         ?int $id,
@@ -95,7 +95,7 @@ class Trip
         string $start_at,
         string $end_at,
         int $is_published,
-        ?string $updated_at = null,
+        ?Carbon $updated_at = null,
         bool $is_collected = false,
         bool $is_liked = false
     ) {
