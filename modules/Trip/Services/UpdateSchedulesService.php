@@ -22,7 +22,7 @@ class UpdateSchedulesService
         $this->schedule_repo = $schedule_repo;
     }
 
-    public function execute(int $trip_id, int $user_id, array $schedules)
+    public function execute(int $trip_id, int $user_id, array $schedules, bool $is_private, bool $is_publish)
     {
         $trip = $this->trip_repo->find($trip_id);
 
@@ -68,6 +68,9 @@ class UpdateSchedulesService
             }
         });
 
-        $this->trip_repo->update($trip_id, ['is_published' => true]);
+        if ($is_publish) {
+            $this->trip_repo->update($trip_id, ['is_published' => $is_publish, 'is_private' => $is_private]);
+        }
+
     }
 }

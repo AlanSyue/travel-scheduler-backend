@@ -134,11 +134,13 @@ class TripController extends Controller
         $user_id = $request->user()->id;
 
         $validated = $request->validate([
+            'is_private' => 'required|boolean',
+            'is_publish' => 'required|boolean',
             'schedules' => 'required|array',
         ]);
 
         try {
-            $service->execute($trip_id, $user_id, $request->schedules);
+            $service->execute($trip_id, $user_id, $request->schedules, $request->is_private, $request->is_publish);
 
             return response()->json();
         } catch (\Throwable $th) {
