@@ -226,7 +226,7 @@ class Trip
             'is_liked' => $this->is_liked,
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
-            'published_at' => $this->updated_at,
+            'published_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'editors' => $this->editors,
         ];
     }
