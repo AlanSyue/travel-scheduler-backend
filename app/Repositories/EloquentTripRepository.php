@@ -58,7 +58,7 @@ class EloquentTripRepository implements TripRepositoryInterface
                 $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip->id, $like_trip_ids) ? true : false;
 
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $is_collected, $is_liked))->toArray();
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->updated_at, $is_collected, $is_liked))->toArray();
             });
     }
 
@@ -95,6 +95,7 @@ class EloquentTripRepository implements TripRepositoryInterface
                     $trip_model->start_at,
                     $trip_model->end_at,
                     $trip_model->is_published,
+                    $trip_model->updated_at,
                     $is_collected,
                     $is_liked
                 ))
@@ -117,7 +118,7 @@ class EloquentTripRepository implements TripRepositoryInterface
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
         return $trip
-            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published))
+            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->updated_at))
                 ->setLikesCount($trip->likes->count())
                 ->setCommentsCount($trip->comments->count())
             : null;
@@ -132,7 +133,7 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->orderBy('updated_at', 'desc')
             ->get()
             ->transform(function (ModelsTrip $trip) {
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published))->toArray();
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->updated_at))->toArray();
             });
     }
 

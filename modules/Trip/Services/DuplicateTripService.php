@@ -36,7 +36,7 @@ class DuplicateTripService
             $title,
             $start_date,
             $end_date,
-            false
+            1
         );
 
         $trip_id = $this->trip_repo->insertGetId($trip);
