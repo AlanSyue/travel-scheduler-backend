@@ -44,6 +44,7 @@ class UserController extends Controller
                 'name' => $target_user->name,
                 'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
                 'is_friend' => in_array($target_user->id, $friend_ids),
+                'friends_count' => $target_user->friends->count(),
             ],
         ]);
     }
