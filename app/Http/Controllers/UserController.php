@@ -31,12 +31,15 @@ class UserController extends Controller
         /** @var User $user */
         $user = auth('api')->user();
 
+        $friend = $user ? $friend_repo->findFriend($user->id, $target_user_id) : null;
+
         return response()->json([
             'data' => [
                 'id' => $target_user->id,
                 'name' => $target_user->name,
                 'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
-                'is_friend' => $user && $friend_repo->isMyFriend($user->id, $target_user_id) ? true : false,
+                'is_friend' => $user && $friend && $friend->is_active ? true : false,
+                'is_invite' => $user && $friend && ! $friend->is_active ? true : false,
                 'friends_count' => $target_user->friends->reject(function ($friend) { return ! $friend->is_active; })->count(),
             ],
         ]);
@@ -148,7 +151,9 @@ class UserController extends Controller
     {
         $user = auth('api')->user();
 
-        $can_see_private = $user && $friend_repo->isMyFriend($user->id, $target_user_id) ? null : false;
+        $friend = $user ? $friend_repo->findFriend($user->id, $target_user_id) : null;
+
+        $can_see_private = $user && $friend && $friend->is_active ? null : false;
 
         return response()->json(['data' => $repo->findByIsPublished(true, $can_see_private, $user ? $user->id : null, $target_user_id)->toArray()]);
     }

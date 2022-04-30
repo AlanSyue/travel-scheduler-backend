@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Models\Friend;
 use Illuminate\Support\Collection;
 
 interface FriendRepositoryInterface
@@ -18,5 +19,5 @@ interface FriendRepositoryInterface
 
     public function findFriends(int $friend_ids, bool $is_active);
 
-    public function isMyFriend(int $user_id, int $target_user_id): bool;
+    public function findFriend(int $user_id, int $target_user_id): ?Friend;
 }
