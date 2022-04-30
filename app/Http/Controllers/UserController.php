@@ -37,7 +37,7 @@ class UserController extends Controller
                 'name' => $target_user->name,
                 'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
                 'is_friend' => $user && $friend_repo->isMyFriend($user->id, $target_user_id) ? true : false,
-                'friends_count' => $target_user->friends->count(),
+                'friends_count' => $target_user->friends->reject(function ($friend) { return ! $friend->is_active; })->count(),
             ],
         ]);
     }
