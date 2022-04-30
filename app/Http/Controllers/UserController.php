@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Repositories\FriendRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -90,6 +91,11 @@ class UserController extends Controller
     public function invite(int $friend_id, FriendRepositoryInterface $repo)
     {
         $user_id = auth('api')->user()->id;
+
+        if ($repo->findFriend($user_id, $friend_id)) {
+            throw new Exception('You have already invite this friend', 1);
+        }
+
         $repo->save($user_id, $friend_id, false);
 
         return response()->json([]);
