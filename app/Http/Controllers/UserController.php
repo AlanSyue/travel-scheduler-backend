@@ -59,7 +59,10 @@ class UserController extends Controller
         if ($request->image) {
             $image_name = $user->id . Str::random(10) . time();
             $image = base64_decode($request->image);
-            Storage::delete($user->image_name);
+            if ($user->image_name) {
+                Storage::delete($user->image_name);
+            }
+
             $response = Storage::disk('s3')->put($image_name, $image, [
                 'visibility' => 'public',
             ]);
