@@ -50,9 +50,9 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/', 'delete');
                     Route::post('/{id}/invite', 'invite');
                     Route::post('/{id}/reply', 'reply');
-                    Route::get('/friends', 'getFriends');
                     Route::get('/invites', 'getInvites');
                 });
+            Route::get('/{id}/friends', 'getFriends');
             Route::get('/{id}', 'find');
             Route::get('/{id}/trips', 'findTrips');
         });

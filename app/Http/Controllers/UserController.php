@@ -110,9 +110,8 @@ class UserController extends Controller
         return response()->json([]);
     }
 
-    public function getFriends(FriendRepositoryInterface $repo, UserRepositoryInterface $user_repo)
+    public function getFriends(int $user_id, FriendRepositoryInterface $repo, UserRepositoryInterface $user_repo)
     {
-        $user_id = auth('api')->user()->id;
         $friend_user_ids = $repo->findMany($user_id, true)->pluck('friend_user_id')->toArray();
         $friends = ($user_repo->findMany($friend_user_ids))
             ->map(function ($user) {
