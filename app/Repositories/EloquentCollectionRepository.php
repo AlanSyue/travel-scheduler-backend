@@ -40,19 +40,7 @@ class EloquentCollectionRepository implements CollectionRepositoryInterface
     public function find(int $user_id): Collection
     {
         return $this->model_collection
-            ->with(['trip'])
             ->where('user_id', $user_id)
-            ->get()
-            ->transform(function (ModelsCollection $model_collection) {
-                $trip = $model_collection->trip;
-
-                return $trip
-                    ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->updated_at))->toArray()
-                    : null;
-            })
-            ->reject(function($trip) {
-                return is_null($trip);
-            })
-            ->values();
+            ->get();
     }
 }

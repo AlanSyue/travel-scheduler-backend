@@ -127,16 +127,37 @@ class EloquentTripRepository implements TripRepositoryInterface
             : null;
     }
 
-    public function findMany(array $trip_ids, $is_published = true): Collection
+    public function findMany(array $trip_ids, ?int $user_id = null, bool $is_published = true, bool $is_private = false): Collection
     {
+        $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+        $like_trip_ids = $user_id ? $this->like_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+
         return $this->trip_model
             ->with(['user'])
             ->whereIn('id', $trip_ids)
             ->where('is_published', $is_published)
+            ->where('is_private', $is_private)
             ->orderBy('updated_at', 'desc')
             ->get()
-            ->transform(function (ModelsTrip $trip) {
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->updated_at))->toArray();
+            ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids) {
+                $is_collected = in_array($trip_model->id, $collection_trip_ids) ? true : false;
+                $is_liked = in_array($trip_model->id, $like_trip_ids) ? true : false;
+
+                $trip = (new Trip(
+                    $trip_model->id,
+                    $trip_model->user,
+                    $trip_model->title,
+                    $trip_model->start_at,
+                    $trip_model->end_at,
+                    $trip_model->is_published,
+                    $trip_model->updated_at,
+                    $is_collected,
+                    $is_liked
+                ))
+                    ->setLikesCount($trip_model->likes->count())
+                    ->setCommentsCount($trip_model->comments->count());
+
+                return $trip->toArray();
             });
     }
 
