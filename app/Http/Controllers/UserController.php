@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function find(int $target_user_id, UserRepositoryInterface $repo, FriendRepositoryInterface $friend_repo)
+    public function find(int $target_user_id, UserRepositoryInterface $repo, FriendRepositoryInterface $friend_repo, TripRepositoryInterface $trip_repo)
     {
         $target_user = $repo->find($target_user_id);
 
@@ -41,6 +41,7 @@ class UserController extends Controller
                 'is_friend' => $user && $friend && $friend->is_active ? true : false,
                 'is_invite' => $user && $friend && ! $friend->is_active ? true : false,
                 'friends_count' => $target_user->friends->reject(function ($friend) { return ! $friend->is_active; })->count(),
+                'trip_count' => $trip_repo->findByIsPublished(true, null, null, $target_user_id)->count(),
             ],
         ]);
     }
