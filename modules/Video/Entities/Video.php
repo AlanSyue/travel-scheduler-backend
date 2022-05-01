@@ -36,7 +36,7 @@ class Video implements Arrayable
             ],
             'url' => env('AWS_URL') . $this->name,
             'location' => $this->location,
-            'created_at' => $this->created_at->format('Y-m-d'),
+            'created_at' => $this->created_at->format('Y.m.d'),
         ];
     }
 }
