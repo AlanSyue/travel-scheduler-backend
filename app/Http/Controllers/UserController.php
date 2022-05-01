@@ -42,7 +42,7 @@ class UserController extends Controller
                 'is_friend' => $user && $friend && $friend->is_active ? true : false,
                 'is_invite' => $user && $friend && ! $friend->is_active ? true : false,
                 'friends_count' => $target_user->friends->reject(function ($friend) { return ! $friend->is_active; })->count(),
-                'trip_count' => $trip_repo->findByIsPublished(true, null, null, $target_user_id)->count(),
+                'trip_count' => $trip_repo->findByIsPublished(true, false, false, null, $target_user_id)->count(),
             ],
         ]);
     }
@@ -159,9 +159,9 @@ class UserController extends Controller
 
         $friend = $user ? $friend_repo->findFriend($user->id, $target_user_id) : null;
 
-        $can_see_private = $user && $friend && $friend->is_active ? null : false;
+        $filter_is_active = $user && $friend && $friend->is_active ? false : true;
 
-        return response()->json(['data' => $repo->findByIsPublished(true, $can_see_private, $user ? $user->id : null, $target_user_id)->toArray()]);
+        return response()->json(['data' => $repo->findByIsPublished(true, $filter_is_active, false, $user ? $user->id : null, $target_user_id)->toArray()]);
     }
 
     public function delete()

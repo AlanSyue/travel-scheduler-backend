@@ -61,7 +61,8 @@ class TripController extends Controller
             $request->title,
             $request->start_date,
             $request->end_date,
-            false
+            0,
+            0
         );
 
         $trip_id = $trip_repo->insertGetId($trip);

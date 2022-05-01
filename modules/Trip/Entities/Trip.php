@@ -75,6 +75,8 @@ class Trip
 
     private $updated_at;
 
+    private $is_private;
+
     /**
      * Create a new entity instance.
      *
@@ -86,6 +88,7 @@ class Trip
      * @param bool     $is_collected
      * @param bool     $is_liked
      * @param int      $is_published
+     * @param int      $is_private
      * @param Carbon   $updated_at
      */
     public function __construct(
@@ -95,6 +98,7 @@ class Trip
         string $start_at,
         string $end_at,
         int $is_published,
+        int $is_private,
         ?Carbon $updated_at = null,
         bool $is_collected = false,
         bool $is_liked = false
@@ -108,6 +112,7 @@ class Trip
         $this->is_liked = $is_liked;
         $this->is_published = $is_published;
         $this->updated_at = $updated_at;
+        $this->is_private = $is_private;
     }
 
     /**
@@ -224,6 +229,7 @@ class Trip
             ],
             'is_collected' => $this->is_collected,
             'is_liked' => $this->is_liked,
+            'is_private' => $this->is_private === 1 ? true : false,
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'published_at' => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
@@ -246,7 +252,8 @@ class Trip
             'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
             'is_collected' => $this->is_collected,
-            'is_liked' => $this->is_liked,
+            'is_private' => $this->is_private === 1 ? true : false,
+            'is_private' => $this->is_private,
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'schedules' => $this->schedules,

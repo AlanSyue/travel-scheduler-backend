@@ -6,7 +6,6 @@ use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Repositories\TripRepositoryInterface;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Trip\Services\SearchTripsService;
@@ -24,7 +23,7 @@ class HomeController extends Controller
     {
         $user = auth('api')->user();
 
-        return response()->json(['data' => $repo->findByIsPublished(true, false, $user ? $user->id : null)->toArray()]);
+        return response()->json(['data' => $repo->findByIsPublished(true, true, false, $user ? $user->id : null)->toArray()]);
     }
 
     public function search(Request $request, SearchTripsService $service): JsonResponse
