@@ -38,9 +38,14 @@ class EloquentFriendRepository implements FriendRepositoryInterface
             ->update(['is_active' => $is_active]);
     }
 
-    public function findMany(int $user_id, bool $is_active): Collection
+    public function findMany(int $user_id, ?bool $is_active): Collection
     {
-        return $this->friend_model->where('user_id', $user_id)->where('is_active', $is_active)->get();
+        return $this->friend_model
+            ->where('user_id', $user_id)
+            ->when($is_active, function($query, $is_active) {
+                return $query->where('is_active', $is_active);
+            })
+            ->get();
     }
 
     public function findFriends(int $friend_ids, bool $is_active)

@@ -11,7 +11,7 @@ class VideoController extends Controller
     public function index(FindVideosService $service)
     {
         try {
-            $videos = $service->execute();
+            $videos = $service->execute(auth('api')->user());
 
             return response()->json([
                 'data' => $videos->toArray(),

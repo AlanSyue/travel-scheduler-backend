@@ -15,7 +15,7 @@ interface FriendRepositoryInterface
 
     public function update(int $user_id, int $friend_id, bool $is_active);
 
-    public function findMany(int $user_id, bool $is_active): Collection;
+    public function findMany(int $user_id, ?bool $is_active): Collection;
 
     public function findFriends(int $friend_ids, bool $is_active);
 
