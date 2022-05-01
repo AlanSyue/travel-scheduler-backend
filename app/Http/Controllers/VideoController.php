@@ -25,9 +25,10 @@ class VideoController extends Controller
     {
         $user_id = auth('api')->user()->id;
         $file = $request->file;
+        $location = $request->location;
 
         try {
-            $service->execute($user_id, $file);
+            $service->execute($user_id, $file, $location);
 
             return response()->json();
         } catch (\Throwable $th) {
