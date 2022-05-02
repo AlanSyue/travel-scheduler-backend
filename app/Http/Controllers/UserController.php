@@ -159,7 +159,7 @@ class UserController extends Controller
 
         $friend = $user ? $friend_repo->findFriend($user->id, $target_user_id) : null;
 
-        $filter_is_active = $user && $friend && $friend->is_active ? false : true;
+        $filter_is_active = $user && ($friend && $friend->is_active || $user->id === $target_user_id) ? false : true;
 
         return response()->json(['data' => $repo->findByIsPublished(true, $filter_is_active, false, $user ? $user->id : null, $target_user_id)->toArray()]);
     }
