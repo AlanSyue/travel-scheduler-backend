@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/home', 'index');
         Route::post('/search', 'search');
         Route::delete('/delete/{id}', 'delete');
+        Route::delete('/friend', 'deleteFriend');
     });
 
     Route::controller(UserController::class)

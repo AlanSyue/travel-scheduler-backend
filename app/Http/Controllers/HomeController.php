@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Friend;
 use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
@@ -53,5 +54,19 @@ class HomeController extends Controller
         $image_model->whereIn('schedule_id', $schedule_ids)->delete();
         $schedule_model->where('trip_id', $id)->delete();
         $trip_model->where('id', $id)->delete();
+    }
+
+    public function deleteFriend(Request $request, Friend $friend_model)
+    {
+        $user_id = $request->user_id;
+        $friend_id = $request->friend_id;
+
+        $friend_model->where('user_id', $user_id)
+            ->where('friend_user_id', $friend_id)
+            ->delete();
+
+        $friend_model->where('user_id', $friend_id)
+            ->where('friend_user_id', $user_id)
+            ->delete();
     }
 }
