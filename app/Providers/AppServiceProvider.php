@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Repositories\CollectionRepositoryInterface;
 use App\Repositories\CommentRepositoryInterface;
+use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\EloquentCollectionRepository;
 use App\Repositories\EloquentCommentRepository;
+use App\Repositories\EloquentEditorRepository;
 use App\Repositories\EloquentFriendRepository;
 use App\Repositories\EloquentLikeRepository;
 use App\Repositories\EloquentScheduleRepository;
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LikeRepositoryInterface::class, EloquentLikeRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, EloquentCommentRepository::class);
         $this->app->bind(FriendRepositoryInterface::class, EloquentFriendRepository::class);
+        $this->app->bind(EditorRepositoryInterface::class, EloquentEditorRepository::class);
     }
 
     /**

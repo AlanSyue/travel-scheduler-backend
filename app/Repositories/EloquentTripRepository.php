@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\Collection as ModelsCollection;
+use App\Models\Editor as ModelsEditor;
 use App\Models\Like as ModelsLike;
 use App\Models\Trip as ModelsTrip;
 use Illuminate\Support\Collection;
@@ -23,18 +24,22 @@ class EloquentTripRepository implements TripRepositoryInterface
 
     private $like_model;
 
+    private $editor_model;
+
     /**
      * Create a new repository instance.
      *
      * @param ModelsTrip       $trip_model
      * @param ModelsCollection $collection_model
      * @param ModelsLike       $like_model
+     * @param ModelsEditor     $editor_model
      */
-    public function __construct(ModelsTrip $trip_model, ModelsCollection $collection_model, ModelsLike $like_model)
+    public function __construct(ModelsTrip $trip_model, ModelsCollection $collection_model, ModelsLike $like_model, ModelsEditor $editor_model)
     {
         $this->trip_model = $trip_model;
         $this->collection_model = $collection_model;
         $this->like_model = $like_model;
+        $this->editor_model = $editor_model;
     }
 
     /**
@@ -57,8 +62,11 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->transform(function (ModelsTrip $trip) use ($collection_trip_ids, $like_trip_ids) {
                 $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip->id, $like_trip_ids) ? true : false;
-
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $trip->updated_at, $is_collected, $is_liked))->toArray();
+                $editors = $this->editor_model
+                    ->with(['user'])
+                    ->where('trip_id', $trip->id)
+                    ->get();
+                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at, $is_collected, $is_liked))->toArray();
             });
     }
 
@@ -95,6 +103,10 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids) {
                 $is_collected = in_array($trip_model->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip_model->id, $like_trip_ids) ? true : false;
+                $editors = $this->editor_model
+                    ->with(['user'])
+                    ->where('trip_id', $trip_model->id)
+                    ->get();
 
                 $trip = (new Trip(
                     $trip_model->id,
@@ -104,6 +116,7 @@ class EloquentTripRepository implements TripRepositoryInterface
                     $trip_model->end_at,
                     $trip_model->is_published,
                     $trip_model->is_private,
+                    $editors,
                     $trip_model->updated_at,
                     $is_collected,
                     $is_liked
@@ -126,8 +139,15 @@ class EloquentTripRepository implements TripRepositoryInterface
     {
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
+        $editors = $trip
+            ? $this->editor_model
+                ->with(['user'])
+                ->where('trip_id', $trip->id)
+                ->get()
+            : collect();
+
         return $trip
-            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $trip->updated_at))
+            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at))
                 ->setLikesCount($trip->likes->count())
                 ->setCommentsCount($trip->comments->count())
             : null;
@@ -148,6 +168,10 @@ class EloquentTripRepository implements TripRepositoryInterface
             ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids) {
                 $is_collected = in_array($trip_model->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip_model->id, $like_trip_ids) ? true : false;
+                $editors = $this->editor_model
+                    ->with(['user'])
+                    ->where('trip_id', $trip_model->id)
+                    ->get();
 
                 $trip = (new Trip(
                     $trip_model->id,
@@ -157,6 +181,7 @@ class EloquentTripRepository implements TripRepositoryInterface
                     $trip_model->end_at,
                     $trip_model->is_published,
                     $trip_model->is_private,
+                    $editors,
                     $trip_model->updated_at,
                     $is_collected,
                     $is_liked

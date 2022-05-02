@@ -68,6 +68,8 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}', 'detail');
                     Route::post('/{id}', 'createSchedules');
                     Route::patch('/{id}', 'update');
+                    Route::post('/{id}/editors', 'addEditor');
+                    Route::delete('/{id}/editors', 'deleteEditor');
                     Route::post('/{id}/likes', 'addLikes');
                     Route::delete('/{id}/likes', 'deleteLikes');
                     Route::post('/{id}/comments', 'addComments');

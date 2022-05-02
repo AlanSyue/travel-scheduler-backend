@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\CommentRepositoryInterface;
+use Exception;
+use Carbon\Carbon;
+use Trip\Entities\Trip;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Trip\Services\GetDetailService;
+use Trip\Transformer\TripsTransformer;
+use Trip\Services\DuplicateTripService;
+use Trip\Services\CreateSchedulesService;
+use Trip\Services\UpdateSchedulesService;
+use Trip\Transformer\TripDetailTransformer;
 use App\Repositories\LikeRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
-use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Trip\Entities\Trip;
-use Trip\Services\CreateSchedulesService;
-use Trip\Services\DuplicateTripService;
-use Trip\Services\GetDetailService;
-use Trip\Services\UpdateSchedulesService;
-use Trip\Transformer\TripDetailTransformer;
-use Trip\Transformer\TripsTransformer;
+use App\Repositories\EditorRepositoryInterface;
+use App\Repositories\CommentRepositoryInterface;
 
 class TripController extends Controller
 {
@@ -28,11 +30,17 @@ class TripController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(Request $request, TripRepositoryInterface $repo, TripsTransformer $transformer): JsonResponse
+    public function index(Request $request, TripRepositoryInterface $repo, EditorRepositoryInterface $editor_repo, TripsTransformer $transformer): JsonResponse
     {
         $user_id = $request->user()->id;
 
-        $trips = $repo->findByUserId($user_id);
+        $own_trips = $repo->findByUserId($user_id);
+
+        $edit_trip_ids = $editor_repo->findByUserId($user_id)->pluck('trip_id')->toArray();
+
+        $edit_trips = $repo->findMany($edit_trip_ids, $user_id, false);
+
+        $trips = $own_trips->concat($edit_trips);
 
         return response()->json($transformer->transform($trips));
     }
@@ -62,7 +70,8 @@ class TripController extends Controller
             $request->start_date,
             $request->end_date,
             0,
-            0
+            0,
+            collect()
         );
 
         $trip_id = $trip_repo->insertGetId($trip);
@@ -241,5 +250,69 @@ class TripController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    public function addEditor(int $trip_id, Request $request, TripRepositoryInterface $trip_reo, EditorRepositoryInterface $editor_repo, UserRepositoryInterface $user_repo)
+    {
+        $editor_id = $request->editor_user_id;
+
+        $trip = $trip_reo->find($trip_id);
+
+        if (! $trip) {
+            throw new Exception('Can not find this trip', 1);
+        }
+
+        if ($trip->getUserId() !== auth('api')->user()->id) {
+            throw new Exception('This is not your trip', 1);
+        }
+
+        $editors = $editor_repo->findByTripId($trip_id);
+
+        $is_editor = $editors->filter(function($editor) use ($editor_id) {
+            return $editor->user_id === $editor_id;
+        })->isNotEmpty();
+
+        if ($is_editor) {
+            throw new Exception('You have been the editor', 1);
+        }
+
+        $editor_repo->save($editor_id, $trip_id);
+
+        $user = $user_repo->find($editor_id);
+
+        return response()->json([
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+            ],
+        ]);
+    }
+
+    public function deleteEditor(int $trip_id, Request $request, TripRepositoryInterface $trip_reo, EditorRepositoryInterface $editor_repo)
+    {
+        $editor_id = $request->editor_user_id;
+
+        $trip = $trip_reo->find($trip_id);
+
+        if (! $trip) {
+            throw new Exception('Can not find this trip', 1);
+        }
+
+        if ($trip->getUserId() !== auth('api')->user()->id) {
+            throw new Exception('This is not your trip', 1);
+        }
+
+        $editors = $editor_repo->findByTripId($trip_id);
+
+        $is_editor = $editors->filter(function($editor) use ($editor_id) {
+            return $editor->user_id === $editor_id;
+        })->isNotEmpty();
+
+        if ($is_editor) {
+            $editor_repo->delete($editor_id, $trip_id);
+        }
+
+        return response()->json();
     }
 }

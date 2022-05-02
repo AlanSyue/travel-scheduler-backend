@@ -26,8 +26,10 @@ class UpdateSchedulesService
     {
         $trip = $this->trip_repo->find($trip_id);
 
-        if ($user_id !== $trip->getUserId()) {
-            throw new Exception('不可更改別人的 trip', 1);
+        $editor_ids = collect($trip->getEditors())->pluck('id')->toArray();
+
+        if ($user_id !== $trip->getUserId() && ! in_array($user_id, $editor_ids)) {
+            throw new Exception('不可刪除別人的 trip', 1);
         }
 
         collect($schedules)->each(function ($schedule) {

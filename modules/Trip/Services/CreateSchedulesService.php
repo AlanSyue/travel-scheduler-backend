@@ -68,7 +68,9 @@ class CreateSchedulesService
     {
         $trip = $this->trip_repo->find($trip_id);
 
-        if ($user_id !== $trip->getUserId()) {
+        $editor_ids = collect($trip->getEditors())->pluck('id')->toArray();
+
+        if ($user_id !== $trip->getUserId() && ! in_array($user_id, $editor_ids)) {
             throw new Exception('不可刪除別人的 trip', 1);
         }
 
@@ -98,7 +100,7 @@ class CreateSchedulesService
             ->values()
             ->toArray();
 
-        event(new UpdateSchedules($trip_id, collect($schedules)->isNotEmpty()? $schedules[0] : []));
+        event(new UpdateSchedules($trip_id, collect($schedules)->isNotEmpty() ? $schedules[0] : []));
 
         $trip->setSchedules($schedules);
 

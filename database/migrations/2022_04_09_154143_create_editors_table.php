@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\Trip;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\User;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -17,9 +18,7 @@ return new class extends Migration
         Schema::create('editors', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Trip::class);
-            $table->string('name');
-            $table->string('image_url');
-            $table->boolean('is_active');
+            $table->foreignIdFor(User::class);
             $table->timestamps();
         });
 

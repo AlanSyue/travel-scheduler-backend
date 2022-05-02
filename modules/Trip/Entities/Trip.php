@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Trip\Entities;
 
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 class Trip
 {
@@ -47,9 +48,9 @@ class Trip
     /**
      * The editors.
      *
-     * @var array
+     * @var Collection
      */
-    private $editors = [];
+    private $editors;
 
     /**
      * The schedules of the trip.
@@ -90,6 +91,7 @@ class Trip
      * @param int      $is_published
      * @param int      $is_private
      * @param Carbon   $updated_at
+     * @param $editors
      */
     public function __construct(
         ?int $id,
@@ -99,6 +101,7 @@ class Trip
         string $end_at,
         int $is_published,
         int $is_private,
+        Collection $editors,
         ?Carbon $updated_at = null,
         bool $is_collected = false,
         bool $is_liked = false
@@ -113,6 +116,7 @@ class Trip
         $this->is_published = $is_published;
         $this->updated_at = $updated_at;
         $this->is_private = $is_private;
+        $this->editors = $editors;
     }
 
     /**
@@ -194,21 +198,16 @@ class Trip
      */
     public function getEditors(): array
     {
-        return $this->editors;
-    }
+        return $this->editors->map(function($editor) {
+            $user = $editor->user;
 
-    /**
-     * Set the value of editors
-     *
-     * @param array $editors
-     *
-     * @return self
-     */
-    public function setEditors(array $editors)
-    {
-        $this->editors = $editors;
-
-        return $this;
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+            ];
+        })
+            ->toArray();
     }
 
     /**
@@ -233,7 +232,7 @@ class Trip
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'published_at' => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
-            'editors' => $this->editors,
+            'editors' => $this->getEditors(),
         ];
     }
 
@@ -247,6 +246,11 @@ class Trip
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'image_url' => $this->user->image_name ? env('AWS_URL') . $this->user->image_name : '',
+            ],
             'days' => $this->getDays(),
             'start_date' => $this->getStartAt()->format('Y-m-d'),
             'end_date' => $this->getEndAt()->format('Y-m-d'),
@@ -257,6 +261,7 @@ class Trip
             'likes_count' => $this->likes_count,
             'comments_count' => $this->comments_count,
             'schedules' => $this->schedules,
+            'editors' => $this->getEditors(),
         ];
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Trip\Services;
 
+use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use Exception;
@@ -28,17 +29,27 @@ class GetDetailService
     private $schedule_repo;
 
     /**
+     * The editor repository instance.
+     *
+     * @var EditorRepositoryInterface
+     */
+    private $editor_repo;
+
+    /**
      * Create a new service instance.
      *
      * @param TripRepositoryInterface     $trip_repo
      * @param ScheduleRepositoryInterface $schedule_repo
+     * @param EditorRepositoryInterface   $editor_repo
      */
     public function __construct(
         TripRepositoryInterface $trip_repo,
         ScheduleRepositoryInterface $schedule_repo,
+        EditorRepositoryInterface $editor_repo
     ) {
         $this->trip_repo = $trip_repo;
         $this->schedule_repo = $schedule_repo;
+        $this->editor_repo = $editor_repo;
     }
 
     /**
@@ -59,7 +70,9 @@ class GetDetailService
             throw new Exception('找不到這個 trip', 1);
         }
 
-        if (! $trip->getIsPublished() && $user_id !== $trip->getUserId()) {
+        $editor_ids = collect($trip->getEditors())->pluck('id')->toArray();
+
+        if (! $trip->getIsPublished() && $user_id !== $trip->getUserId() && ! in_array($user_id, $editor_ids)) {
             throw new Exception('不是你的 trip', 1);
         }
 
