@@ -200,13 +200,19 @@ class Trip
     {
         return $this->editors->map(function($editor) {
             $user = $editor->user;
-
+            if (! $user) {
+                return;
+            }
             return [
                 'id' => $user->id,
                 'name' => $user->name,
                 'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
             ];
         })
+            ->reject(function($editor) {
+                return ! $editor;
+            })
+            ->values()
             ->toArray();
     }
 
