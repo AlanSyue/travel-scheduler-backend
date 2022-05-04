@@ -60,24 +60,27 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('/trips')
         ->group(function () {
-            Route::middleware('auth:api')
-                ->controller(TripController::class)
+            Route::controller(TripController::class)
                 ->group(function () {
-                    Route::get('/', 'index');
-                    Route::post('/', 'create');
-                    Route::post('/duplicate', 'duplicate');
-                    Route::post('/{id}', 'createSchedules');
-                    Route::patch('/{id}', 'update');
-                    Route::post('/{id}/editors', 'addEditor');
-                    Route::delete('/{id}/editors', 'deleteEditor');
-                    Route::post('/{id}/likes', 'addLikes');
-                    Route::delete('/{id}/likes', 'deleteLikes');
-                    Route::post('/{id}/comments', 'addComments');
-                    Route::delete('/{id}/comments/{comment_id}', 'deleteComments');
+                    Route::middleware('auth:api')->group(function() {
+                        Route::get('/', 'index');
+                        Route::post('/', 'create');
+                        Route::post('/duplicate', 'duplicate');
+                        Route::post('/{id}', 'createSchedules');
+                        Route::patch('/{id}', 'update');
+                        Route::post('/{id}/editors', 'addEditor');
+                        Route::delete('/{id}/editors', 'deleteEditor');
+                        Route::post('/{id}/likes', 'addLikes');
+                        Route::delete('/{id}/likes', 'deleteLikes');
+                        Route::post('/{id}/comments', 'addComments');
+                        Route::delete('/{id}/comments/{comment_id}', 'deleteComments');
+                    });
+
+                    Route::get('/{id}', 'detail');
                 });
+
             Route::controller(ReactionController::class)
                 ->group(function () {
-                    Route::get('/{id}', 'detail');
                     Route::get('/{id}/likes', 'getLikeUsers');
                     Route::get('/{id}/comments', 'getComments');
                 });
