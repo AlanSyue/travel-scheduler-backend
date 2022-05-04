@@ -66,7 +66,6 @@ Route::prefix('v1')->group(function () {
                     Route::get('/', 'index');
                     Route::post('/', 'create');
                     Route::post('/duplicate', 'duplicate');
-                    Route::get('/{id}', 'detail');
                     Route::post('/{id}', 'createSchedules');
                     Route::patch('/{id}', 'update');
                     Route::post('/{id}/editors', 'addEditor');
@@ -78,6 +77,7 @@ Route::prefix('v1')->group(function () {
                 });
             Route::controller(ReactionController::class)
                 ->group(function () {
+                    Route::get('/{id}', 'detail');
                     Route::get('/{id}/likes', 'getLikeUsers');
                     Route::get('/{id}/comments', 'getComments');
                 });
