@@ -7,6 +7,7 @@ namespace Trip\Services;
 use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
+use BlockRepositoryInterface;
 use Exception;
 use Illuminate\Support\Collection;
 use Trip\Entities\Schedule;
@@ -35,21 +36,26 @@ class GetDetailService
      */
     private $editor_repo;
 
+    private $block_repo;
+
     /**
      * Create a new service instance.
      *
      * @param TripRepositoryInterface     $trip_repo
      * @param ScheduleRepositoryInterface $schedule_repo
      * @param EditorRepositoryInterface   $editor_repo
+     * @param BlockRepositoryInterface    $block_repo
      */
     public function __construct(
         TripRepositoryInterface $trip_repo,
         ScheduleRepositoryInterface $schedule_repo,
-        EditorRepositoryInterface $editor_repo
+        EditorRepositoryInterface $editor_repo,
+        BlockRepositoryInterface $block_repo
     ) {
         $this->trip_repo = $trip_repo;
         $this->schedule_repo = $schedule_repo;
         $this->editor_repo = $editor_repo;
+        $this->block_repo = $block_repo;
     }
 
     /**
@@ -70,9 +76,15 @@ class GetDetailService
             throw new Exception('找不到這個 trip', 1);
         }
 
+        $owner_id = $trip->getUserId();
+
+        if ($user_id && $this->block_repo->find($owner_id, $user_id)) {
+            throw new Exception('You can not access this page', 1);
+        }
+
         $editor_ids = collect($trip->getEditors())->pluck('id')->toArray();
 
-        if (! $trip->getIsPublished() && $user_id !== $trip->getUserId() && ! in_array($user_id, $editor_ids)) {
+        if (! $trip->getIsPublished() && $user_id !== $owner_id && ! in_array($user_id, $editor_ids)) {
             throw new Exception('不是你的 trip', 1);
         }
 

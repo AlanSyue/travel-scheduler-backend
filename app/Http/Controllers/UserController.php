@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Repositories\FriendRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use BlockRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,8 +20,13 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function find(int $target_user_id, UserRepositoryInterface $repo, FriendRepositoryInterface $friend_repo, TripRepositoryInterface $trip_repo)
-    {
+    public function find(
+        int $target_user_id,
+        UserRepositoryInterface $repo,
+        FriendRepositoryInterface $friend_repo,
+        TripRepositoryInterface $trip_repo,
+        BlockRepositoryInterface $block_repo
+    ) {
         $target_user = $repo->find($target_user_id);
 
         if (! $target_user) {
@@ -33,6 +39,10 @@ class UserController extends Controller
         $user = auth('api')->user();
 
         $friend = $user ? $friend_repo->findFriend($user->id, $target_user_id) : null;
+
+        if ($user && $block_repo->find($target_user_id, $user->id)) {
+            throw new Exception('You can not access this page', 1);
+        }
 
         return response()->json([
             'data' => [
@@ -180,5 +190,30 @@ class UserController extends Controller
         Trip::where('user_id', $user_id)->delete();
 
         $user->delete();
+    }
+
+    public function blockUser(int $block_user_id, BlockRepositoryInterface $repo)
+    {
+        $user_id = auth('api')->user()->id;
+        if ($repo->find($user_id, $block_user_id)) {
+            throw new Exception('You have been already block this user', 1);
+        }
+
+        $repo->save($user_id, $block_user_id);
+
+        return response()->json();
+    }
+
+    public function unBlockUser(int $block_user_id, BlockRepositoryInterface $repo)
+    {
+        $user_id = auth('api')->user()->id;
+
+        if (! $repo->find($user_id, $block_user_id)) {
+            throw new Exception('You have not block this user', 1);
+        }
+
+        $repo->delete($user_id, $block_user_id);
+
+        return response()->json();
     }
 }

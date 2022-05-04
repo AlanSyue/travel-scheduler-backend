@@ -52,6 +52,8 @@ Route::prefix('v1')->group(function () {
                     Route::post('/{id}/invite', 'invite');
                     Route::post('/{id}/reply', 'reply');
                     Route::get('/invites', 'getInvites');
+                    Route::post('/{id}/block', 'blockUser');
+                    Route::delete('/{id}/block', 'unBlockUser');
                 });
             Route::get('/{id}/friends', 'getFriends');
             Route::get('/{id}', 'find');

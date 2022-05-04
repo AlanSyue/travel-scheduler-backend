@@ -8,6 +8,7 @@ use App\Models\Collection as ModelsCollection;
 use App\Models\Editor as ModelsEditor;
 use App\Models\Like as ModelsLike;
 use App\Models\Trip as ModelsTrip;
+use BlockRepositoryInterface;
 use Illuminate\Support\Collection;
 use Trip\Entities\Trip;
 
@@ -26,47 +27,65 @@ class EloquentTripRepository implements TripRepositoryInterface
 
     private $editor_model;
 
+    private $block_repo;
+
     /**
      * Create a new repository instance.
      *
-     * @param ModelsTrip       $trip_model
-     * @param ModelsCollection $collection_model
-     * @param ModelsLike       $like_model
-     * @param ModelsEditor     $editor_model
+     * @param ModelsTrip               $trip_model
+     * @param ModelsCollection         $collection_model
+     * @param ModelsLike               $like_model
+     * @param ModelsEditor             $editor_model
+     * @param BlockRepositoryInterface $block_repo
      */
-    public function __construct(ModelsTrip $trip_model, ModelsCollection $collection_model, ModelsLike $like_model, ModelsEditor $editor_model)
-    {
+    public function __construct(
+        ModelsTrip $trip_model,
+        ModelsCollection $collection_model,
+        ModelsLike $like_model,
+        ModelsEditor $editor_model,
+        BlockRepositoryInterface $block_repo
+    ) {
         $this->trip_model = $trip_model;
         $this->collection_model = $collection_model;
         $this->like_model = $like_model;
         $this->editor_model = $editor_model;
+        $this->block_repo = $block_repo;
     }
 
     /**
      * Find by user ID.
      *
-     * @param int $user_id
+     * @param null|int $user_id
      *
      * @return Trip[]
      */
-    public function findByUserId(int $user_id): Collection
+    public function findByUserId(?int $user_id): Collection
     {
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
         $like_trip_ids = $user_id ? $this->like_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+        $block_user_ids = $user_id ? $this->block_repo->findByUserId($user_id)->pluck('block_user_id')->toArray() : [];
 
         return $this->trip_model
             ->with(['user'])
             ->where('user_id', $user_id)
             ->where('is_published', false)
             ->get()
-            ->transform(function (ModelsTrip $trip) use ($collection_trip_ids, $like_trip_ids) {
+            ->transform(function (ModelsTrip $trip) use ($collection_trip_ids, $like_trip_ids, $block_user_ids) {
+                $owner = $trip->user;
+                if (in_array($owner->id, $block_user_ids)) {
+                    return;
+                }
                 $is_collected = in_array($trip->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip->id, $like_trip_ids) ? true : false;
                 $editors = $this->editor_model
                     ->with(['user'])
                     ->where('trip_id', $trip->id)
                     ->get();
-                return (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at, $is_collected, $is_liked))->toArray();
+
+                return (new Trip($trip->id, $owner, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at, $is_collected, $is_liked))->toArray();
+            })
+            ->reject(function($trip) {
+                return ! $trip;
             });
     }
 
@@ -88,6 +107,7 @@ class EloquentTripRepository implements TripRepositoryInterface
     ): Collection {
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
         $like_trip_ids = $user_id ? $this->like_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+        $block_user_ids = $user_id ? $this->block_repo->findByUserId($user_id)->pluck('block_user_id')->toArray() : [];
 
         return $this->trip_model
             ->with(['user', 'likes', 'comments'])
@@ -100,7 +120,12 @@ class EloquentTripRepository implements TripRepositoryInterface
             })
             ->orderBy('updated_at', 'desc')
             ->get()
-            ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids) {
+            ->transform(function (ModelsTrip $trip_model) use ($collection_trip_ids, $like_trip_ids, $block_user_ids) {
+                $owner = $trip_model->user;
+                if (in_array($owner->id, $block_user_ids)) {
+                    return;
+                }
+
                 $is_collected = in_array($trip_model->id, $collection_trip_ids) ? true : false;
                 $is_liked = in_array($trip_model->id, $like_trip_ids) ? true : false;
                 $editors = $this->editor_model
@@ -110,7 +135,7 @@ class EloquentTripRepository implements TripRepositoryInterface
 
                 $trip = (new Trip(
                     $trip_model->id,
-                    $trip_model->user,
+                    $owner,
                     $trip_model->title,
                     $trip_model->start_at,
                     $trip_model->end_at,
@@ -125,6 +150,9 @@ class EloquentTripRepository implements TripRepositoryInterface
                     ->setCommentsCount($trip_model->comments->count());
 
                 return $trip->toArray();
+            })
+            ->reject(function($trip) {
+                return ! $trip;
             });
     }
 
@@ -139,10 +167,15 @@ class EloquentTripRepository implements TripRepositoryInterface
     {
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
+        $block_user_ids = $this->block_repo->findByUserId($trip->user_id)->pluck('block_user_id')->toArray();
+
         $editors = $trip
             ? $this->editor_model
                 ->with(['user'])
                 ->where('trip_id', $trip->id)
+                ->when($block_user_ids, function($query, $block_user_ids) {
+                    return $query->whereNotIn('user_id', $block_user_ids);
+                })
                 ->get()
             : collect();
 
