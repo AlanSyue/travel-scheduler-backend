@@ -56,12 +56,12 @@ class GetDetailService
      * Execute the service.
      *
      * @param int      $trip_id
-     * @param int      $user_id
+     * @param null|int $user_id
      * @param null|int $day
      *
      * @return Trip
      */
-    public function execute(int $trip_id, int $user_id, ?int $day): Trip
+    public function execute(int $trip_id, ?int $user_id, ?int $day): Trip
     {
         /** @var Trip $trip */
         $trip = $this->trip_repo->find($trip_id);
