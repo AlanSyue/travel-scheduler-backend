@@ -44,6 +44,17 @@ class UserController extends Controller
             throw new Exception('You can not access this page', 1);
         }
 
+        $block_user_ids = $user
+            ? $block_repo->findByUserId($user->id)->pluck('block_user_id')->toArray()
+            : [];
+
+        $friends_count = $target_user->friends
+            ->reject(function ($friend) use ($block_user_ids) {
+
+                return ! $friend->is_active && in_array($friend->friend_user_id, $block_user_ids);
+            })
+            ->count();
+
         return response()->json([
             'data' => [
                 'id' => $target_user->id,
@@ -51,7 +62,7 @@ class UserController extends Controller
                 'image_url' => $target_user->image_name ? env('AWS_URL') . $target_user->image_name : '',
                 'is_friend' => $user && $friend && $friend->is_active ? true : false,
                 'is_invite' => $user && $friend && ! $friend->is_active ? true : false,
-                'friends_count' => $target_user->friends->reject(function ($friend) { return ! $friend->is_active; })->count(),
+                'friends_count' => $friends_count,
                 'trip_count' => $trip_repo->findByIsPublished(true, false, false, null, $target_user_id)->count(),
             ],
         ]);
