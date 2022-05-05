@@ -13,7 +13,7 @@ interface TripRepositoryInterface
 
     public function insertGetId(Trip $trip): int;
 
-    public function find(int $trip_id): ?Trip;
+    public function find(int $trip_id, ?int $user_id = null): ?Trip;
 
     public function findMany(array $trip_ids, ?int $user_id = null, bool $is_published = true, bool $is_private = false): Collection;
 

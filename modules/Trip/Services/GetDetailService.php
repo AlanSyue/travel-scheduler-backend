@@ -70,7 +70,7 @@ class GetDetailService
     public function execute(int $trip_id, ?int $user_id, ?int $day): Trip
     {
         /** @var Trip $trip */
-        $trip = $this->trip_repo->find($trip_id);
+        $trip = $this->trip_repo->find($trip_id, $user_id);
 
         if (! $trip) {
             throw new Exception('找不到這個 trip', 1);
