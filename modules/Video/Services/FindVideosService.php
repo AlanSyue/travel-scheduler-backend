@@ -28,7 +28,7 @@ class FindVideosService
     public function execute(?User $user): Collection
     {
         $friends = $user ? $this->friend_repo->findMany($user->id, null) : collect();
-        $block_user_ids = $user ? $this->block_repo->findByUserId($user->id)->pluck('user_id')->toArray() : [];
+        $block_user_ids = $user ? $this->block_repo->findByUserId($user->id)->pluck('block_user_id')->toArray() : [];
 
         return $this->repo->findMany($friends, $block_user_ids);
     }

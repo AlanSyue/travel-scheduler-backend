@@ -152,7 +152,8 @@ class EloquentTripRepository implements TripRepositoryInterface
             })
             ->reject(function ($trip) {
                 return ! $trip;
-            });
+            })
+            ->values();
     }
 
     /**

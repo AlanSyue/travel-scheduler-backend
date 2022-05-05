@@ -104,7 +104,7 @@ class TripController extends Controller
         TripDetailTransformer $transformer
     ): JsonResponse {
         $day = $request->query('day');
-        $user = $request->user();
+        $user = auth('api')->user();
 
         try {
             $trip_detail = $service->execute($trip_id, $user ? $user->id : null, $day);
