@@ -18,13 +18,15 @@ class EloquentBlockRepository implements BlockRepositoryInterface
 
     public function save(int $user_id, int $block_user_id)
     {
-        $this->block_model->user_id = $user_id;
-        $this->block_model->block_user_id = $block_user_id;
-        $this->block_model->save();
+        $block_model = new ModelsBlock();
+        $block_model->user_id = $user_id;
+        $block_model->block_user_id = $block_user_id;
+        $block_model->save();
 
-        $this->block_model->user_id = $block_user_id;
-        $this->block_model->block_user_id = $user_id;
-        $this->block_model->save();
+        $block_model = new ModelsBlock();
+        $block_model->user_id = $block_user_id;
+        $block_model->block_user_id = $user_id;
+        $block_model->save();
     }
 
     public function delete(int $user_id, int $block_user_id)
