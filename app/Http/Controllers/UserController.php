@@ -161,7 +161,7 @@ class UserController extends Controller
     {
         $user_id = auth('api')->user()->id;
         $invite_user_ids = $repo->findFriends($user_id, false)->pluck('user_id')->toArray();
-        $block_user_ids = $block_repo($user_id)->pluck('block_user_id')->toArray();
+        $block_user_ids = $block_repo->findByUserId($user_id)->pluck('block_user_id')->toArray();
 
         $friends = ($user_repo->findMany($invite_user_ids))
             ->map(function ($user) use ($block_user_ids) {
