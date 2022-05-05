@@ -51,7 +51,7 @@ class UserController extends Controller
         $friends_count = $target_user->friends
             ->reject(function ($friend) use ($block_user_ids) {
 
-                return ! $friend->is_active && in_array($friend->friend_user_id, $block_user_ids);
+                return ! $friend->is_active || in_array($friend->friend_user_id, $block_user_ids);
             })
             ->count();
 
