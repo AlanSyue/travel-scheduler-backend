@@ -172,6 +172,9 @@ class EloquentTripRepository implements TripRepositoryInterface
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
         $is_collected = in_array($trip_id, $collection_trip_ids) ? true : false;
 
+        $like_trip_ids = $user_id ? $this->like_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
+        $is_liked = in_array($trip_id, $like_trip_ids) ? true : false;
+
         $editors = $trip
             ? $this->editor_model
                 ->with(['user'])
@@ -183,7 +186,19 @@ class EloquentTripRepository implements TripRepositoryInterface
             : collect();
 
         return $trip
-            ? (new Trip($trip->id, $trip->user, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at, $is_collected))
+            ? (new Trip(
+                $trip->id,
+                $trip->user,
+                $trip->title,
+                $trip->start_at,
+                $trip->end_at,
+                $trip->is_published,
+                $trip->is_private,
+                $editors,
+                $trip->updated_at,
+                $is_collected,
+                $is_liked
+            ))
                 ->setLikesCount($trip->likes->count())
                 ->setCommentsCount($trip->comments->count())
             : null;
