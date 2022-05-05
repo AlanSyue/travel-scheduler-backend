@@ -265,6 +265,7 @@ class Trip
             'is_private' => $this->is_private === 1 ? true : false,
             'is_private' => $this->is_private,
             'likes_count' => $this->likes_count,
+            'is_liked' => $this->is_liked,
             'comments_count' => $this->comments_count,
             'schedules' => $this->schedules,
             'editors' => $this->getEditors(),
