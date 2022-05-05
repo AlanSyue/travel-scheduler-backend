@@ -8,7 +8,6 @@ use App\Models\Collection as ModelsCollection;
 use App\Models\Editor as ModelsEditor;
 use App\Models\Like as ModelsLike;
 use App\Models\Trip as ModelsTrip;
-use BlockRepositoryInterface;
 use Illuminate\Support\Collection;
 use Trip\Entities\Trip;
 
@@ -84,7 +83,7 @@ class EloquentTripRepository implements TripRepositoryInterface
 
                 return (new Trip($trip->id, $owner, $trip->title, $trip->start_at, $trip->end_at, $trip->is_published, $trip->is_private, $editors, $trip->updated_at, $is_collected, $is_liked))->toArray();
             })
-            ->reject(function($trip) {
+            ->reject(function ($trip) {
                 return ! $trip;
             });
     }
@@ -151,7 +150,7 @@ class EloquentTripRepository implements TripRepositoryInterface
 
                 return $trip->toArray();
             })
-            ->reject(function($trip) {
+            ->reject(function ($trip) {
                 return ! $trip;
             });
     }
@@ -173,7 +172,7 @@ class EloquentTripRepository implements TripRepositoryInterface
             ? $this->editor_model
                 ->with(['user'])
                 ->where('trip_id', $trip->id)
-                ->when($block_user_ids, function($query, $block_user_ids) {
+                ->when($block_user_ids, function ($query, $block_user_ids) {
                     return $query->whereNotIn('user_id', $block_user_ids);
                 })
                 ->get()

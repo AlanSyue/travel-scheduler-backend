@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Trip\Services;
 
+use App\Repositories\BlockRepositoryInterface;
 use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
-use BlockRepositoryInterface;
 use Exception;
 use Illuminate\Support\Collection;
 use Trip\Entities\Schedule;

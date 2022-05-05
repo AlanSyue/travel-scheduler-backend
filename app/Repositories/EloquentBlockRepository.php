@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\Blocks as ModelsBlock;
-use BlockRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class EloquentBlockRepository implements BlockRepositoryInterface

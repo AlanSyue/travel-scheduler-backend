@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\User;
+use App\Repositories\BlockRepositoryInterface;
 use App\Repositories\CommentRepositoryInterface;
 use App\Repositories\LikeRepositoryInterface;
-use BlockRepositoryInterface;
 use Carbon\Carbon;
 
 class ReactionController extends Controller

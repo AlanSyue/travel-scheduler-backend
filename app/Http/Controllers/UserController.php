@@ -9,10 +9,10 @@ use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Models\User;
+use App\Repositories\BlockRepositoryInterface;
 use App\Repositories\FriendRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
-use BlockRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -126,17 +126,30 @@ class UserController extends Controller
         return response()->json([]);
     }
 
-    public function getFriends(int $user_id, FriendRepositoryInterface $repo, UserRepositoryInterface $user_repo)
-    {
+    public function getFriends(
+        int $user_id,
+        FriendRepositoryInterface $repo,
+        UserRepositoryInterface $user_repo,
+        BlockRepositoryInterface $block_repo
+    ) {
         $friend_user_ids = $repo->findMany($user_id, true)->pluck('friend_user_id')->toArray();
+        $block_user_ids = $block_repo->findByUserId($user_id)->pluck('block_user_id')->toArray();
         $friends = ($user_repo->findMany($friend_user_ids))
-            ->map(function ($user) {
+            ->map(function ($user) use ($block_user_ids) {
+                if (in_array($user->id, $block_user_ids)) {
+                    return;
+                }
+
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
                 ];
             })
+            ->reject(function ($friend) {
+                return ! $friend;
+            })
+            ->values()
             ->toArray();
 
         return response()->json([
@@ -144,18 +157,28 @@ class UserController extends Controller
         ]);
     }
 
-    public function getInvites(FriendRepositoryInterface $repo, UserRepositoryInterface $user_repo)
+    public function getInvites(FriendRepositoryInterface $repo, UserRepositoryInterface $user_repo, BlockRepositoryInterface $block_repo)
     {
         $user_id = auth('api')->user()->id;
         $invite_user_ids = $repo->findFriends($user_id, false)->pluck('user_id')->toArray();
+        $block_user_ids = $block_repo($user_id)->pluck('block_user_id')->toArray();
+
         $friends = ($user_repo->findMany($invite_user_ids))
-            ->map(function ($user) {
+            ->map(function ($user) use ($block_user_ids) {
+                if (in_array($user->id, $block_user_ids)) {
+                    return;
+                }
+
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
                 ];
             })
+            ->reject(function ($friend) {
+                return ! $friend;
+            })
+            ->values()
             ->toArray();
 
         return response()->json([

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\BlockRepositoryInterface;
 use App\Repositories\CollectionRepositoryInterface;
 use App\Repositories\CommentRepositoryInterface;
 use App\Repositories\EditorRepositoryInterface;
@@ -19,7 +20,6 @@ use App\Repositories\LikeRepositoryInterface;
 use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\VideoRepositoryInterface;
-use BlockRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
