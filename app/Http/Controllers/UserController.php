@@ -215,6 +215,25 @@ class UserController extends Controller
         $user->delete();
     }
 
+    public function getBlockUsers(BlockRepositoryInterface $repo)
+    {
+        $block_users = ($repo->findByUserId(auth('api')->user()->id))
+            ->map(function ($block) {
+                $user = User::find($block->block_user_id);
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+                ];
+            })
+            ->toArray();
+
+        return response()->json([
+            'data' => $block_users,
+        ]);
+    }
+
     public function blockUser(int $block_user_id, BlockRepositoryInterface $repo)
     {
         $user_id = auth('api')->user()->id;

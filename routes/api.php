@@ -49,6 +49,7 @@ Route::prefix('v1')->group(function () {
                 ->group(function () {
                     Route::patch('/', 'update');
                     Route::delete('/', 'delete');
+                    Route::get('/blocks', 'getBlockUsers');
                     Route::post('/{id}/invite', 'invite');
                     Route::post('/{id}/reply', 'reply');
                     Route::get('/invites', 'getInvites');
