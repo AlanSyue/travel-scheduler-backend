@@ -38,7 +38,6 @@ Route::prefix('v1')->group(function () {
     Route::controller(HomeController::class)->group(function () {
         Route::get('/home', 'index');
         Route::post('/search', 'search');
-        Route::delete('/delete/{id}', 'delete');
         Route::delete('/friend', 'deleteFriend');
     });
 
@@ -72,6 +71,7 @@ Route::prefix('v1')->group(function () {
                         Route::post('/duplicate', 'duplicate');
                         Route::post('/{id}', 'createSchedules');
                         Route::patch('/{id}', 'update');
+                        Route::delete('/{id}', 'delete');
                         Route::post('/{id}/editors', 'addEditor');
                         Route::delete('/{id}/editors', 'deleteEditor');
                         Route::post('/{id}/likes', 'addLikes');
