@@ -74,6 +74,14 @@ class CreateSchedulesService
             throw new Exception('不可刪除別人的 trip', 1);
         }
 
+        $duration_days = $trip->getDays();
+
+        foreach (range(1, $duration_days) as $duration_day) {
+            if ($duration_day != $day && $this->schedule_repo->isEmptyByDay($trip_id, $duration_day)) {
+                throw new Exception("第{$duration_day}天行程是空", 1);
+            }
+        }
+
         $trip_id = $trip->getId();
 
         $schedules = $this->transformer->transform($schedules, $trip_id, $day);

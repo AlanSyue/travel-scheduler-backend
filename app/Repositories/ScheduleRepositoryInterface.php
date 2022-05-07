@@ -19,4 +19,6 @@ interface ScheduleRepositoryInterface
     public function insertImages(int $schedule_id, array $images);
 
     public function searchByName(string $word): Collection;
+
+    public function isEmptyByDay(int $trip_id, int $day): bool;
 }

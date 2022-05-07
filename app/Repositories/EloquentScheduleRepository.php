@@ -124,4 +124,11 @@ class EloquentScheduleRepository implements ScheduleRepositoryInterface
     {
         return $this->schedule_model->where('name', 'regexp', $word)->get();
     }
+
+    public function isEmptyByDay(int $trip_id, int $day): bool
+    {
+        return $this->schedule_model->where('trip_id', $trip_id)
+            ->where('day', $day)
+            ->isEmpty();
+    }
 }
