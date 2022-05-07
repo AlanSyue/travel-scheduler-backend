@@ -64,7 +64,7 @@ class CreateSchedulesService
      *
      * @return Trip
      */
-    public function execute(int $trip_id, int $user_id, int $day, array $schedules): Trip
+    public function execute(int $trip_id, int $user_id, int $day, array $schedules, bool $is_finished): Trip
     {
         $trip = $this->trip_repo->find($trip_id);
 
@@ -74,13 +74,10 @@ class CreateSchedulesService
             throw new Exception('不可刪除別人的 trip', 1);
         }
 
-        $duration_days = $trip->getDays();
-
-        foreach (range(1, $duration_days) as $duration_day) {
-            if ($duration_day != $day && $this->schedule_repo->isEmptyByDay($trip_id, $duration_day)) {
-                throw new Exception("第{$duration_day}天行程是空", 1);
-            }
+        if ($is_finished) {
+            $this->checkHasEmptyScheduleDay($trip, $day);
         }
+
 
         $trip_id = $trip->getId();
 
@@ -113,5 +110,17 @@ class CreateSchedulesService
         $trip->setSchedules($schedules);
 
         return $trip;
+    }
+
+    private function checkHasEmptyScheduleDay(Trip $trip, int $day)
+    {
+        $duration_days = $trip->getDays();
+        $trip_id = $trip->getId();
+
+        foreach (range(1, $duration_days) as $duration_day) {
+            if ($duration_day != $day && $this->schedule_repo->isEmptyByDay($trip_id, $duration_day)) {
+                throw new Exception("第{$duration_day}天行程是空", 1);
+            }
+        }
     }
 }

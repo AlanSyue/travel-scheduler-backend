@@ -148,9 +148,10 @@ class TripController extends Controller
     public function createSchedules(int $trip_id, Request $request, CreateSchedulesService $service): JsonResponse
     {
         $user_id = $request->user()->id;
+        $is_finished = $request->is_finished ?? false;
 
         try {
-            $trip = $service->execute($trip_id, $user_id, $request->day, $request->schedules);
+            $trip = $service->execute($trip_id, $user_id, $request->day, $request->schedules, $is_finished);
 
             return response()->json([
                 'data' => $trip->toDetailArray(),
