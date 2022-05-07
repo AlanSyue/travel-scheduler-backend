@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 interface UserRepositoryInterface
 {
@@ -15,4 +16,6 @@ interface UserRepositoryInterface
     public function find(int $user_id): ?User;
 
     public function findMany(array $user_ids);
+
+    public function searchByName(string $name): Collection;
 }

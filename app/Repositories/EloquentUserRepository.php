@@ -65,4 +65,9 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         return $this->user->whereIn('id', $user_ids)->get();
     }
+
+    public function searchByName(string $word): Collection
+    {
+        return $this->user->where('name', 'regexp', $word)->get();
+    }
 }

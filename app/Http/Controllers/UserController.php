@@ -50,7 +50,6 @@ class UserController extends Controller
 
         $friends_count = $target_user->friends
             ->reject(function ($friend) use ($block_user_ids) {
-
                 return ! $friend->is_active || in_array($friend->friend_user_id, $block_user_ids);
             })
             ->count();
@@ -65,6 +64,34 @@ class UserController extends Controller
                 'friends_count' => $friends_count,
                 'trip_count' => $trip_repo->findByIsPublished(true, false, false, null, $target_user_id)->count(),
             ],
+        ]);
+    }
+
+    public function search(Request $request, UserRepositoryInterface $repo, BlockRepositoryInterface $block_repo)
+    {
+        $user_id = auth('api')->user()->id;
+        $block_user_ids = $block_repo->findByUserId($user_id)->pluck('block_user_id')->toArray();
+
+        $users = $repo->searchByName($request->name)
+            ->map(function ($user) use ($block_user_ids) {
+                if (in_array($user->id, $block_user_ids)) {
+                    return;
+                }
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+                ];
+            })
+            ->reject(function ($user) {
+                return ! $user;
+            })
+            ->values()
+            ->toArray();
+
+        return response()->json([
+            'data' => $users,
         ]);
     }
 
