@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-use Carbon\Carbon;
-use Trip\Entities\Trip;
 use App\Models\Schedule;
-use Illuminate\Http\Request;
 use App\Models\ScheduleImage;
-use Illuminate\Http\JsonResponse;
 use App\Models\Trip as ModelsTrip;
-use Trip\Services\GetDetailService;
-use Trip\Transformer\TripsTransformer;
-use Trip\Services\DuplicateTripService;
-use Trip\Services\CreateSchedulesService;
-use Trip\Services\UpdateSchedulesService;
-use Trip\Transformer\TripDetailTransformer;
+use App\Repositories\CommentRepositoryInterface;
+use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\LikeRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
-use App\Repositories\EditorRepositoryInterface;
-use App\Repositories\CommentRepositoryInterface;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Trip\Entities\Trip;
+use Trip\Services\CreateSchedulesService;
+use Trip\Services\DuplicateTripService;
+use Trip\Services\GetDetailService;
+use Trip\Services\UpdateSchedulesService;
+use Trip\Transformer\TripDetailTransformer;
+use Trip\Transformer\TripsTransformer;
 
 class TripController extends Controller
 {
@@ -122,7 +122,11 @@ class TripController extends Controller
     {
         $trip = $trip_model->find($id);
         if (! $trip) {
-            throw new \Exception('無此 trip', 1);
+            throw new Exception('無此 trip', 1);
+        }
+
+        if ($trip->user_id !== auth('api')->user()->id) {
+            throw new Exception('不能刪除別人的 Trip', 1);
         }
 
         $schedule_ids = $schedule_model->where('trip_id', $id)->get()->pluck('id')->toArray();
@@ -285,7 +289,7 @@ class TripController extends Controller
 
         $editors = $editor_repo->findByTripId($trip_id);
 
-        $is_editor = $editors->filter(function($editor) use ($editor_id) {
+        $is_editor = $editors->filter(function ($editor) use ($editor_id) {
             return $editor->user_id === $editor_id;
         })->isNotEmpty();
 
@@ -322,7 +326,7 @@ class TripController extends Controller
 
         $editors = $editor_repo->findByTripId($trip_id);
 
-        $is_editor = $editors->filter(function($editor) use ($editor_id) {
+        $is_editor = $editors->filter(function ($editor) use ($editor_id) {
             return $editor->user_id === $editor_id;
         })->isNotEmpty();
 
