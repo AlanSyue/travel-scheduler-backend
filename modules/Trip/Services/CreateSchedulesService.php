@@ -117,10 +117,19 @@ class CreateSchedulesService
         $duration_days = $trip->getDays();
         $trip_id = $trip->getId();
 
+        $empty_days = [];
+
         foreach (range(1, $duration_days) as $duration_day) {
             if ($duration_day != $day && $this->schedule_repo->isEmptyByDay($trip_id, $duration_day)) {
-                throw new Exception("第{$duration_day}天行程是空", 1);
+                $empty_days[] = $duration_day;
             }
+        }
+
+        if (count($empty_days) > 0) {
+            $empty_days_string = implode(",", $empty_days);
+
+            throw new Exception("第{$empty_days_string}天行程是空", 1);
+
         }
     }
 }
