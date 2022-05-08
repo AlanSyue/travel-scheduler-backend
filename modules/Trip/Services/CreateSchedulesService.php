@@ -129,7 +129,6 @@ class CreateSchedulesService
             $empty_days_string = implode(",", $empty_days);
 
             throw new Exception("第{$empty_days_string}天行程是空", 1);
-
         }
     }
 }

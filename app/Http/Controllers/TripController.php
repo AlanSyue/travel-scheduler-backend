@@ -8,6 +8,7 @@ use App\Models\Trip as ModelsTrip;
 use App\Repositories\CommentRepositoryInterface;
 use App\Repositories\EditorRepositoryInterface;
 use App\Repositories\LikeRepositoryInterface;
+use App\Repositories\ScheduleRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Carbon\Carbon;
@@ -90,6 +91,86 @@ class TripController extends Controller
         ]);
     }
 
+    public function update(
+        int $trip_id,
+        Request $request,
+        TripRepositoryInterface $repo,
+        ScheduleRepositoryInterface $schedule_repo
+    ) {
+        $validated = $request->validate([
+            'title' => 'string',
+            'start_date' => 'date',
+            'end_date' => 'date',
+        ]);
+
+        $trip = $repo->find($trip_id);
+
+        if ($trip->getIsPublished()) {
+            throw new Exception('已發布的行程不能修改', 1);
+        }
+
+        $user_id = auth('api')->user()->id;
+
+        if ($user_id !== $trip->getUserId()) {
+            throw new Exception('不可修改別人的 trip', 1);
+        }
+
+        $title = $request->title;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        if (Carbon::parse($start_date)->gte(Carbon::parse($end_date))) {
+            throw new Exception('開始時間不能大於結束時間', 1);
+        }
+
+        $update_data = [];
+        $is_modify_date = false;
+
+        if ($title) {
+            $update_data['title'] = $title;
+        }
+
+        if ($start_date) {
+            $is_modify_date = true;
+            $update_data['start_at'] = $start_date;
+        }
+
+        if ($end_date) {
+            $is_modify_date = true;
+            $update_data['end_at'] = $end_date;
+        }
+
+        try {
+            $repo->update($trip_id, $update_data);
+
+            $new_days = $is_modify_date
+                ? (Carbon::parse($start_date)->diffInDays(Carbon::parse($end_date))) + 1
+                : $trip->getDays();
+
+            $origin_days = $trip->getDays();
+
+            $unused_days = array_diff(range(1, $origin_days), range(1, $new_days));
+
+            foreach ($unused_days as $unused_day) {
+                $schedule_repo->deleteByTripId($trip_id, $unused_day);
+            }
+
+            $trip = $repo->find($trip_id);
+
+            return response()->json([
+                'data' => [
+                    'id' => $trip_id,
+                    'title' => $trip->getTitle(),
+                    'start_date' => $trip->getStartAt()->format('Y-m-d'),
+                    'end_date' => $trip->getEndAt()->format('Y-m-d'),
+                    'days' => $trip->getDays(),
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
     /**
      * Get the trip detail.
      *
@@ -161,7 +242,7 @@ class TripController extends Controller
         }
     }
 
-    public function update(int $trip_id, Request $request, UpdateSchedulesService $service)
+    public function updateSchedules(int $trip_id, Request $request, UpdateSchedulesService $service)
     {
         $user_id = $request->user()->id;
 

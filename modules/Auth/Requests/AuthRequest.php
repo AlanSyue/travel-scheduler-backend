@@ -40,8 +40,8 @@ class AuthRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|string',
-            'password' => 'required|string',
+            'email' => 'required|email:rfc,dns',
+            'password' => 'required|string|min:6|regex:/[a-zA-Z]/|regex:/[0-9]/',
             'name' => 'required|string',
         ];
     }

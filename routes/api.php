@@ -69,8 +69,9 @@ Route::prefix('v1')->group(function () {
                         Route::get('/', 'index');
                         Route::post('/', 'create');
                         Route::post('/duplicate', 'duplicate');
-                        Route::post('/{id}', 'createSchedules');
                         Route::patch('/{id}', 'update');
+                        Route::post('/{id}/schedules', 'createSchedules');
+                        Route::patch('/{id}/schedules', 'updateSchedules');
                         Route::delete('/{id}', 'delete');
                         Route::post('/{id}/editors', 'addEditor');
                         Route::delete('/{id}/editors', 'deleteEditor');
@@ -80,7 +81,7 @@ Route::prefix('v1')->group(function () {
                         Route::delete('/{id}/comments/{comment_id}', 'deleteComments');
                     });
 
-                    Route::get('/{id}', 'detail');
+                    Route::get('/{id}/schedules', 'detail');
                 });
 
             Route::controller(ReactionController::class)

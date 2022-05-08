@@ -167,6 +167,10 @@ class EloquentTripRepository implements TripRepositoryInterface
     {
         $trip = $this->trip_model->where('id', $trip_id)->first();
 
+        if (! $trip) {
+            return null;
+        }
+
         $block_user_ids = $this->block_repo->findByUserId($trip->user_id)->pluck('block_user_id')->toArray();
 
         $collection_trip_ids = $user_id ? $this->collection_model->where('user_id', $user_id)->get()->pluck('trip_id')->toArray() : [];
