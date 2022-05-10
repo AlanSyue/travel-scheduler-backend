@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\ScheduleImage;
 use App\Models\Trip;
 use App\Models\User;
+use App\Models\Video;
 use App\Repositories\BlockRepositoryInterface;
 use App\Repositories\FriendRepositoryInterface;
 use App\Repositories\TripRepositoryInterface;
@@ -249,6 +250,7 @@ class UserController extends Controller
         Like::where('user_id', $user_id)->delete();
         Schedule::whereIn('trip_id', $trip_ids)->delete();
         Trip::where('user_id', $user_id)->delete();
+        Video::where('user_id', $user_id)->delete();
 
         $user->delete();
     }
