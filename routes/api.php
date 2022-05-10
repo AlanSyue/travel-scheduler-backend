@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/home', 'index');
         Route::post('/search', 'search');
         Route::delete('/friend', 'deleteFriend');
+        Route::delete('/delete/{id}', 'delete');
     });
 
     Route::controller(UserController::class)
@@ -65,7 +66,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::controller(TripController::class)
                 ->group(function () {
-                    Route::middleware('auth:api')->group(function() {
+                    Route::middleware('auth:api')->group(function () {
                         Route::get('/', 'index');
                         Route::post('/', 'create');
                         Route::post('/duplicate', 'duplicate');
