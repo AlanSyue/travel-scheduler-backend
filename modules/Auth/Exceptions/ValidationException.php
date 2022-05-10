@@ -25,7 +25,7 @@ class ValidationException extends GeneralException
         $payloads = collect($payloads)->map(function($payload) {
             return self::PAYLOAD_MAPPING[$payload] ?? $payload;
         })
-        ->implode(',');
+        ->implode(' ');
 
         parent::__construct(
             new AuthErrorCode(AuthErrorCode::VALIDATION_FAILED),
