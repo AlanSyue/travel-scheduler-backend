@@ -12,6 +12,7 @@ class ValidationException extends GeneralException
     private const PAYLOAD_MAPPING = [
         'email' => 'Email',
         'password' => '密碼',
+        'name' => '名稱',
     ];
 
     /**
