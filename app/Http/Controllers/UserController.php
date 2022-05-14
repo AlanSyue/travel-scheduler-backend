@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use App\Models\Comment;
+use App\Models\Friend;
 use App\Models\Like;
 use App\Models\Schedule;
 use App\Models\ScheduleImage;
@@ -251,6 +252,8 @@ class UserController extends Controller
         Schedule::whereIn('trip_id', $trip_ids)->delete();
         Trip::where('user_id', $user_id)->delete();
         Video::where('user_id', $user_id)->delete();
+        Friend::where('user_id', $user_id)->delete();
+        Friend::where('friend_user_id', $user_id)->delete();
 
         $user->delete();
     }
