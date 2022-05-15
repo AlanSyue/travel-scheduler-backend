@@ -104,6 +104,11 @@ Route::prefix('v1')->group(function () {
         ->controller(VideoController::class)
         ->group(function () {
             Route::get('/', 'index');
-            Route::middleware('auth:api')->post('/', 'create');
+            Route::get('/{id}/rating', 'getRatingList');
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', 'create');
+                Route::post('/{id}/rating', 'addRating');
+                Route::delete('/{id}/rating', 'deleteRating');
+            });
         });
 });

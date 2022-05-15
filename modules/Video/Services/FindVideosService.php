@@ -18,8 +18,11 @@ class FindVideosService
 
     private $block_repo;
 
-    public function __construct(VideoRepositoryInterface $repo, FriendRepositoryInterface $friend_repo, BlockRepositoryInterface $block_repo)
-    {
+    public function __construct(
+        VideoRepositoryInterface $repo,
+        FriendRepositoryInterface $friend_repo,
+        BlockRepositoryInterface $block_repo
+    ) {
         $this->repo = $repo;
         $this->friend_repo = $friend_repo;
         $this->block_repo = $block_repo;

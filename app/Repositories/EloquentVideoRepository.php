@@ -20,12 +20,12 @@ class EloquentVideoRepository implements VideoRepositoryInterface
     public function findMany(Collection $friends, array $block_user_ids = []): Collection
     {
         return $this->video_model
-            ->with(['user'])
+            ->with(['user', 'ratings'])
             ->whereNotIn('user_id', $block_user_ids)
             ->orderBy('id', 'desc')
             ->get()
             ->map(function($video) use ($friends) {
-                return new Video($video->user, $video->name, $video->location, $video->created_at, $friends);
+                return new Video($video->id, $video->user, $video->name, $video->location, $video->created_at, $friends, $video->ratings);
             });
     }
 
