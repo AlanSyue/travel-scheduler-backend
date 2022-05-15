@@ -63,8 +63,14 @@ class VideoController extends Controller
 
         try {
             $repo->save($video_id, $user_id, $type);
+            $rating = $repo->findByVideoId($video_id);
 
-            return response()->json();
+            return response()->json([
+                'ratings' => [
+                    'total' => $rating->count(),
+                    'type' => $rating->pluck('type')->unique()->sort()->values()->toArray(),
+                ],
+            ]);
         } catch (\Throwable $th) {
             throw $th;
         }
