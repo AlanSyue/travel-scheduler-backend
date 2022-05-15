@@ -119,7 +119,7 @@ class TripController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        if (Carbon::parse($start_date)->gte(Carbon::parse($end_date))) {
+        if (Carbon::parse($start_date)->gt(Carbon::parse($end_date))) {
             throw new Exception('開始時間不能大於結束時間', 1);
         }
 
