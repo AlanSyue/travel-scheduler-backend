@@ -56,7 +56,7 @@ class Video implements Arrayable
             'location' => $this->location,
             'ratings' => [
                 'total' => $this->ratings->count(),
-                'type' => $this->ratings->pluck('type')->unique()->toArray(),
+                'type' => $this->ratings->pluck('type')->unique()->sort()->toArray(),
             ],
             'created_at' => $this->created_at->format('Y.m.d'),
         ];
