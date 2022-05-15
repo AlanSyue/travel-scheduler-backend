@@ -68,7 +68,7 @@ class VideoController extends Controller
             return response()->json([
                 'ratings' => [
                     'total' => $rating->count(),
-                    'type' => $rating->pluck('type')->unique()->toArray(),
+                    'type' => $rating->pluck('type')->unique()->sort()->values()->toArray(),
                 ],
             ]);
         } catch (\Throwable $th) {
