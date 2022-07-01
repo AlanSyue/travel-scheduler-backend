@@ -28,10 +28,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->when(EmailRegisterService::class)
-            ->needs(UserRepositoryInterface::class)
-            ->give(EloquentUserRepository::class);
-
+        $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(ClientRepositoryInterface::class, EloquentClientRepository::class);
     }
 

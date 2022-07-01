@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Trip\Entities;
 
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 class Trip
 {
@@ -16,11 +18,11 @@ class Trip
     private $id;
 
     /**
-     * The user ID.
+     * The user model instance.
      *
-     * @var int
+     * @var User
      */
-    private $user_id;
+    private $user;
 
     /**
      * The trip title.
@@ -44,35 +46,77 @@ class Trip
     private $end_at;
 
     /**
-     * The trip total days.
-     *
-     * @var int
-     */
-    private $days;
-
-    /**
      * The editors.
      *
-     * @var array
+     * @var Collection
      */
-    private $editors = [];
+    private $editors;
+
+    /**
+     * The schedules of the trip.
+     *
+     * @var array|Schedule[]
+     */
+    private $schedules = [];
+
+    /**
+     * Determine the trip is collected or not.
+     *
+     * @var bool
+     */
+    private $is_collected;
+
+    private $likes_count = 0;
+
+    private $comments_count = 0;
+
+    private $is_liked;
+
+    private $is_published;
+
+    private $updated_at;
+
+    private $is_private;
 
     /**
      * Create a new entity instance.
      *
      * @param null|int $id
-     * @param int      $user_id
+     * @param User     $user
      * @param string   $title
      * @param string   $start_at
      * @param string   $end_at
+     * @param bool     $is_collected
+     * @param bool     $is_liked
+     * @param int      $is_published
+     * @param int      $is_private
+     * @param Carbon   $updated_at
+     * @param $editors
      */
-    public function __construct(?int $id, int $user_id, string $title, string $start_at, string $end_at)
-    {
+    public function __construct(
+        ?int $id,
+        User $user,
+        string $title,
+        string $start_at,
+        string $end_at,
+        int $is_published,
+        int $is_private,
+        Collection $editors,
+        ?Carbon $updated_at = null,
+        bool $is_collected = false,
+        bool $is_liked = false
+    ) {
         $this->id = $id;
-        $this->user_id = $user_id;
+        $this->user = $user;
         $this->title = $title;
         $this->start_at = $start_at;
         $this->end_at = $end_at;
+        $this->is_collected = $is_collected;
+        $this->is_liked = $is_liked;
+        $this->is_published = $is_published;
+        $this->updated_at = $updated_at;
+        $this->is_private = $is_private;
+        $this->editors = $editors;
     }
 
     /**
@@ -106,21 +150,7 @@ class Trip
      */
     public function getUserId(): int
     {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the user ID.
-     *
-     * @param int $user_id
-     *
-     * @return self
-     */
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
+        return $this->user->id;
     }
 
     /**
@@ -168,21 +198,22 @@ class Trip
      */
     public function getEditors(): array
     {
-        return $this->editors;
-    }
-
-    /**
-     * Set the value of editors
-     *
-     * @param array $editors
-     *
-     * @return self
-     */
-    public function setEditors(array $editors)
-    {
-        $this->editors = $editors;
-
-        return $this;
+        return $this->editors->map(function($editor) {
+            $user = $editor->user;
+            if (! $user) {
+                return;
+            }
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'image_url' => $user->image_name ? env('AWS_URL') . $user->image_name : '',
+            ];
+        })
+            ->reject(function($editor) {
+                return ! $editor;
+            })
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -196,7 +227,48 @@ class Trip
             'id' => $this->id,
             'title' => $this->title,
             'days' => $this->getDays(),
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'image_url' => $this->user->image_name ? env('AWS_URL') . $this->user->image_name : '',
+            ],
+            'is_collected' => $this->is_collected,
+            'is_liked' => $this->is_liked,
+            'is_private' => $this->is_private === 1 ? true : false,
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
+            'published_at' => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
+            'editors' => $this->getEditors(),
+        ];
+    }
+
+    /**
+     * Transform to trip detail array.
+     *
+     * @return array
+     */
+    public function toDetailArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'image_url' => $this->user->image_name ? env('AWS_URL') . $this->user->image_name : '',
+            ],
+            'days' => $this->getDays(),
+            'start_date' => $this->getStartAt()->format('Y-m-d'),
+            'end_date' => $this->getEndAt()->format('Y-m-d'),
             'editors' => $this->editors,
+            'is_collected' => $this->is_collected,
+            'is_private' => $this->is_private === 1 ? true : false,
+            'is_private' => $this->is_private,
+            'likes_count' => $this->likes_count,
+            'is_liked' => $this->is_liked,
+            'comments_count' => $this->comments_count,
+            'schedules' => $this->schedules,
+            'editors' => $this->getEditors(),
         ];
     }
 
@@ -246,5 +318,48 @@ class Trip
         $this->end_at = $end_at;
 
         return $this;
+    }
+
+    /**
+     * Get the schedules of the trip.
+     *
+     * @return array|Schedule[]
+     */
+    public function getSchedules(): array
+    {
+        return $this->schedules;
+    }
+
+    /**
+     * Set the schedules of the trip.
+     *
+     * @param array|Schedule[] $schedules the schedules of the trip
+     *
+     * @return self
+     */
+    public function setSchedules($schedules): self
+    {
+        $this->schedules = $schedules;
+
+        return $this;
+    }
+
+    public function setLikesCount(int $likes_count): self
+    {
+        $this->likes_count = $likes_count;
+
+        return $this;
+    }
+
+    public function setCommentsCount(int $comments_count): self
+    {
+        $this->comments_count = $comments_count;
+
+        return $this;
+    }
+
+    public function getIsPublished(): bool
+    {
+        return $this->is_published === 1 ? true : false;
     }
 }

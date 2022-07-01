@@ -31,9 +31,9 @@ class EloquentUserRepository implements UserRepositoryInterface
      *
      * @param string $email
      *
-     * @return null|Collection
+     * @return null|User
      */
-    public function findByEmail(string $email): ?Collection
+    public function findByEmail(string $email): ?User
     {
         return $this->user->where('email', $email)->first();
     }
@@ -54,5 +54,20 @@ class EloquentUserRepository implements UserRepositoryInterface
             'password' => $password,
             'name' => $name,
         ]);
+    }
+
+    public function find(int $user_id): ?User
+    {
+        return $this->user->find($user_id);
+    }
+
+    public function findMany(array $user_ids)
+    {
+        return $this->user->whereIn('id', $user_ids)->get();
+    }
+
+    public function searchByName(string $word): Collection
+    {
+        return $this->user->where('name', 'regexp', $word)->get();
     }
 }
