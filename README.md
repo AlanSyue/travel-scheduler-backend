@@ -1,5 +1,13 @@
-# Travel Scheduler Backend
-This is the API service for the Travel Scheduler App.
+# Personal Project - FunTraveler (Backend)
+
+<p align="center">
+  <img src="https://i.ibb.co/4JynXzf/71-4x.png" width="150"/>
+<!--   <img src="https://i.ibb.co/FXpy4Dd/1-4x.png" width="130" height="130"/> -->
+</p>
+
+<p align="center" style="margin:0px 50px 0px 60px">
+This is the API service for the FunTraveler, an App that provides a platform for members to share their trips, <br>sync the information and co-edit their itineraries with group members.
+</p>
 
 # Set up
 ## Install Docker
