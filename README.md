@@ -9,6 +9,9 @@
 This is the API service for the FunTraveler, an App that provides a platform for members to share their trips, <br>sync the information and co-edit their itineraries with group members.
 </p>
 
+# Frontend repository
+https://github.com/sallylin831006/FunTraveler
+
 # Set up
 ## Install Docker
 You will need Docker installed and running on your computer. Docker is the virtualization software that powers the local development environment. Docker can be installed just like any other regular application.
